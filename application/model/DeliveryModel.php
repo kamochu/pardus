@@ -123,6 +123,8 @@ class DeliveryModel
 		$query = $database->prepare($sql);
 		$query->execute(array(':time_stamp' => $time_stamp , ':sub_req_id' => $sub_req_id, ':trace_unique_id' => $trace_unique_id, ':correlator' => $correlator,':dest_address' => $dest_address, ':delivery_status' => $delivery_status));	
 		
+		//add last insert id, may be used in the next method calls
+		$data['_lastInsertID'] = $database->lastInsertId();
 		
 		$row_count = $query->rowCount();
 		$database->commit();
@@ -160,18 +162,20 @@ class DeliveryModel
 		$correlator = "";
 		$dest_address = "";
 		$delivery_status = "";
+		$delivery_receipt_id=0;
 		
 		//get the data from array
 		if(isset($data['correlator'])) $correlator = $data['correlator'];
 		if(isset($data['address'])) $dest_address = $data['address'];
 		if(isset($data['deliveryStatus'])) $delivery_status = $data['deliveryStatus'];
+		if(isset($data['_lastInsertID'])) $delivery_receipt_id = $data['_lastInsertID'];
 		
 		// add some logic to handle exceptions in this script
 		$database = DatabaseFactory::getFactory()->getConnection();
 		$database->beginTransaction();
-		$sql="UPDATE tbl_outbound_messages SET delivery_timestamp = NOW(), delivery_status=:delivery_status, delivery_notif_type=2,last_updated_on=NOW() WHERE dest_addresses=:dest_address AND correlator=:correlator";// IMPORTANT - note dest_addresses in the where clause (to be visited later)
+		$sql="UPDATE tbl_outbound_messages SET delivery_timestamp = NOW(), delivery_status=:delivery_status, delivery_notif_type=2, delivery_receipt_id =:delivery_receipt_id, last_updated_on=NOW() WHERE dest_addresses=:dest_address AND correlator=:correlator";// IMPORTANT - note dest_addresses in the where clause (to be visited later)
 		$query = $database->prepare($sql);
-		$query->execute(array(':delivery_status' => $delivery_status , ':dest_address' => $dest_address, ':correlator' => $correlator));	
+		$query->execute(array(':delivery_status' => $delivery_status , ':delivery_receipt_id' => $delivery_receipt_id, ':dest_address' => $dest_address, ':correlator' => $correlator));	
 		
 		$row_count = $query->rowCount();
 		$database->commit();
