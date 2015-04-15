@@ -53,10 +53,10 @@ return array(
 	 * DB_CHARSET The charset, necessary for security reasons. Check Database.php class for more info.
 	 */
 	'DB_TYPE' => 'mysql',
-	'DB_HOST' => '127.0.0.1',
+	'DB_HOST' => '192.168.0.15',
 	'DB_NAME' => 'huge',
 	'DB_USER' => 'root',
-	'DB_PASS' => '12345678',
+	'DB_PASS' => 'admin',
 	'DB_PORT' => '3306',
 	'DB_CHARSET' => 'utf8',
 	/**

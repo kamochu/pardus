@@ -1,6 +1,6 @@
 <?php
 
-class NotifyController extends Controller
+class DeliveryController extends Controller
 {
     /**
      * Construct this object by extending the basic Controller class
@@ -11,7 +11,7 @@ class NotifyController extends Controller
     }
 	
     /**
-     * Handles what happens when user moves to URL/notify
+     * Handles what happens when user moves to URL/delivery
      */
     public function index()
     {
@@ -19,12 +19,12 @@ class NotifyController extends Controller
 		$raw_post_data = file_get_contents("php://input");
 		
 		//process the data
-		$resultData = NotifyModel::process($raw_post_data);
+		$resultData = DeliveryModel::process($raw_post_data);
 		
 		if($resultData['result'] == 0)  // successful processing
 		{
 			//render the view and pass the raw post data
-        	$this->View->renderWithoutHeaderAndFooter('notify/index',$resultData);
+        	$this->View->renderWithoutHeaderAndFooter('delivery/index',$resultData);
 		}
 		else if( $resultData['result'] == 11) // decoding failure
 		{
@@ -42,9 +42,9 @@ class NotifyController extends Controller
     }
 	
 	/**
-     * Handles what happens when user moves to URL/notify/sms
+     * Handles what happens when user moves to URL/delivery/receipt
      */
-	 public function sms()
+	 public function receipt()
 	 {
 		 $this->index();
 	 }

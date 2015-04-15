@@ -1,12 +1,13 @@
 <?php
 
 /**
- * NotifyModel
+ * DeliveryModel
  *
  */
-class NotifyModel
+class SubscriptionModel
 {
-    /**
+	
+	 /**
      * Notify sms process .
      *
      * @param $data mixed the raw request data to be processed
@@ -68,7 +69,9 @@ class NotifyModel
 		//parse the message
 		if($parser->parse($data, true) == 1) //1 means parsing was successful
 		{
-			return array("result"=>"0", "resultDesc"=>"XML Parsing successful", "data"=>$parser->getParameters());
+			$parameters = $parser->getParameters(); // get the parameters
+			$parameters['repeatedParameters'] = $parser->getRepeatedParametersArray(); //append repeated parameters array to the parameters
+			return array("result"=>"0", "resultDesc"=>"XML Parsing successful", "data"=>$parameters);
 		}
 		
 		//return parsing failure
@@ -85,8 +88,8 @@ class NotifyModel
      */
 	protected static function preProcess($data)
 	{
-		//check for required parameters 
-		if(isset($data['message']) && isset($data['senderAddress']) && isset($data['smsServiceActivationNumber']))
+		//check for required parameters; ID - msisdn, updateType and productID
+		if(isset($data['ID']) && isset($data['updateType']) && isset($data['productID']))
 		{
 			return array("result"=>"0", "resultDesc"=>"Preprocessing successful",  "data"=>$data);
 		}
@@ -101,41 +104,52 @@ class NotifyModel
 	 * @return int array indicating the processing status and data after processing
      */
 	protected static function save($data)
-	{	
-	
+	{
 		//initialize the parameters
-		$sp_rev_id ="";
-		$sp_re_password = "";
+		$subscriber_id ="";
 		$sp_id = "";
+		$product_id = "";
 		$service_id = "";
-		$link_id = "";
-		$trace_unique_id = "";
-		$correlator = "";
-		$message = "";
-		$sender_address = "";
-		$dest_address = "";
-		$date_time = "";
+		$service_list = "";
+		$update_type = "";
+		$update_time = "";
+		$update_desc = "";
+		$effective_time = "";
+		$expiry_time = "";
+		$named_parameters = "";
 		
 		//get the data from array
-		if(isset($data['spRevId'])) $sp_rev_id = $data['spRevId'];
-		if(isset($data['spRevpassword'])) $sp_re_password = $data['spRevpassword'];
-		if(isset($data['spId'])) $sp_id = $data['spId'];
-		if(isset($data['serviceId'])) $service_id = $data['serviceId'];
-		if(isset($data['linkid'])) $link_id = $data['linkid'];
-		if(isset($data['traceUniqueID'])) $trace_unique_id = $data['traceUniqueID'];
-		if(isset($data['correlator'])) $correlator = $data['correlator'];
-		if(isset($data['message'])) $message = $data['message'];
-		if(isset($data['senderAddress'])) $sender_address = $data['senderAddress'];
-		if(isset($data['smsServiceActivationNumber'])) $dest_address = $data['smsServiceActivationNumber'];
-		if(isset($data['dateTime'])) $date_time = $data['dateTime'];
+		if(isset($data['ID'])) $subscriber_id = $data['ID'];
+		if(isset($data['spID'])) $sp_id = $data['spID'];
+		if(isset($data['productID'])) $product_id = $data['productID'];
+		if(isset($data['serviceID'])) $service_id = $data['serviceID'];
+		if(isset($data['serviceList'])) $service_list = $data['serviceList'];
+		if(isset($data['updateType'])) $update_type = $data['updateType'];
+		if(isset($data['updateTime'])) $update_time = $data['updateTime'];
+		if(isset($data['updateDesc'])) $update_desc = $data['updateDesc'];
+		if(isset($data['effectiveTime'])) $effective_time = $data['effectiveTime'];
+		if(isset($data['expiryTime'])) $expiry_time = $data['expiryTime'];
+	
+		
+		// process named parameters - key value pairs
+		if(isset($data['key']))
+		{
+			$count = $data['repeatedParameters']['key'];
+			$named_parameters_array = array($data['key'] => $data['value']); //initial key and value pair
+			
+			for($i=1; $i<=$count; $i++)
+			{
+				$named_parameters_array[$data['key'.$i]]= $data['value'.$i];
+			}
+			$named_parameters = json_encode($named_parameters_array); //encode into json string
+		}	
 		
 		// add some logic to handle exceptions in this script
 		$database = DatabaseFactory::getFactory()->getConnection();
 		$database->beginTransaction();
-		$sql="INSERT INTO tbl_inbound_messages (service_id, link_id, trace_unique_id, correlator, message, sender_address, dest_address, date_time, created_on) VALUES (:service_id, :link_id, :trace_unique_id, :correlator, :message, :sender_address, :dest_address, :date_time, NOW());";
+		$sql="INSERT INTO tbl_subscription_messages (subscriber_id, sp_id,  product_id, service_id, service_list, update_type, update_time, update_desc, effective_time, expiry_time, named_parameters, created_on) VALUES (:subscriber_id, :sp_id, :product_id, :service_id, :service_list, :update_type, :update_time, :update_desc, :effective_time, :expiry_time, :named_parameters, NOW());";
 		$query = $database->prepare($sql);
-		
-		$query->execute(array(':service_id' => $service_id , ':link_id' => $link_id, ':trace_unique_id' => $trace_unique_id, ':correlator' => $correlator, ':message' => $message, ':sender_address' => $sender_address, ':dest_address' => $dest_address, ':date_time' => $date_time));	
+		$query->execute(array(':subscriber_id' => $subscriber_id , ':sp_id' => $sp_id, ':product_id' => $product_id, ':service_id' => $service_id, ':service_list' => $service_list, ':update_type' => $update_type, ':update_time' => $update_time, ':update_desc' => $update_desc, ':effective_time' => $effective_time,  ':expiry_time' => $expiry_time,  ':named_parameters' => $named_parameters));	
 		
 		
 		$row_count = $query->rowCount();

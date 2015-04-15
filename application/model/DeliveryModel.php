@@ -1,10 +1,10 @@
 <?php
 
 /**
- * NotifyModel
+ * DeliveryModel
  *
  */
-class NotifyModel
+class DeliveryModel
 {
     /**
      * Notify sms process .
@@ -73,8 +73,6 @@ class NotifyModel
 		
 		//return parsing failure
 		return array("result"=>"12", "resultDesc"=>"XML Parsing failed", "data"=>$data);
-		
-		
 	}
 	
 	/**
@@ -86,7 +84,7 @@ class NotifyModel
 	protected static function preProcess($data)
 	{
 		//check for required parameters 
-		if(isset($data['message']) && isset($data['senderAddress']) && isset($data['smsServiceActivationNumber']))
+		if(isset($data['deliveryStatus']) && isset($data['address']) && isset($data['correlator']))
 		{
 			return array("result"=>"0", "resultDesc"=>"Preprocessing successful",  "data"=>$data);
 		}
@@ -101,41 +99,29 @@ class NotifyModel
 	 * @return int array indicating the processing status and data after processing
      */
 	protected static function save($data)
-	{	
-	
+	{
 		//initialize the parameters
-		$sp_rev_id ="";
-		$sp_re_password = "";
-		$sp_id = "";
-		$service_id = "";
-		$link_id = "";
+		$time_stamp ="";
+		$sub_req_id = "";
 		$trace_unique_id = "";
 		$correlator = "";
-		$message = "";
-		$sender_address = "";
 		$dest_address = "";
-		$date_time = "";
+		$delivery_status = "";
 		
 		//get the data from array
-		if(isset($data['spRevId'])) $sp_rev_id = $data['spRevId'];
-		if(isset($data['spRevpassword'])) $sp_re_password = $data['spRevpassword'];
-		if(isset($data['spId'])) $sp_id = $data['spId'];
-		if(isset($data['serviceId'])) $service_id = $data['serviceId'];
-		if(isset($data['linkid'])) $link_id = $data['linkid'];
+		if(isset($data['timeStamp'])) $time_stamp = $data['timeStamp'];
+		if(isset($data['subReqID'])) $sub_req_id = $data['subReqID'];
 		if(isset($data['traceUniqueID'])) $trace_unique_id = $data['traceUniqueID'];
 		if(isset($data['correlator'])) $correlator = $data['correlator'];
-		if(isset($data['message'])) $message = $data['message'];
-		if(isset($data['senderAddress'])) $sender_address = $data['senderAddress'];
-		if(isset($data['smsServiceActivationNumber'])) $dest_address = $data['smsServiceActivationNumber'];
-		if(isset($data['dateTime'])) $date_time = $data['dateTime'];
+		if(isset($data['address'])) $dest_address = $data['address'];
+		if(isset($data['deliveryStatus'])) $delivery_status = $data['deliveryStatus'];
 		
 		// add some logic to handle exceptions in this script
 		$database = DatabaseFactory::getFactory()->getConnection();
 		$database->beginTransaction();
-		$sql="INSERT INTO tbl_inbound_messages (service_id, link_id, trace_unique_id, correlator, message, sender_address, dest_address, date_time, created_on) VALUES (:service_id, :link_id, :trace_unique_id, :correlator, :message, :sender_address, :dest_address, :date_time, NOW());";
+		$sql="INSERT INTO tbl_delivery_receipts (time_stamp, sub_req_id, trace_unique_id, correlator, dest_address, delivery_status, created_on) VALUES (:time_stamp, :sub_req_id, :trace_unique_id, :correlator, :dest_address, :delivery_status, NOW());";
 		$query = $database->prepare($sql);
-		
-		$query->execute(array(':service_id' => $service_id , ':link_id' => $link_id, ':trace_unique_id' => $trace_unique_id, ':correlator' => $correlator, ':message' => $message, ':sender_address' => $sender_address, ':dest_address' => $dest_address, ':date_time' => $date_time));	
+		$query->execute(array(':time_stamp' => $time_stamp , ':sub_req_id' => $sub_req_id, ':trace_unique_id' => $trace_unique_id, ':correlator' => $correlator,':dest_address' => $dest_address, ':delivery_status' => $delivery_status));	
 		
 		
 		$row_count = $query->rowCount();
@@ -169,6 +155,32 @@ class NotifyModel
      */
 	protected static function hook($data)
 	{
-		return array("result"=>"0", "resultDesc"=>"Hook execution successful",  "data"=>$data);
+		/* Update outgoing table with the parameters */
+		//initialize the parameters
+		$correlator = "";
+		$dest_address = "";
+		$delivery_status = "";
+		
+		//get the data from array
+		if(isset($data['correlator'])) $correlator = $data['correlator'];
+		if(isset($data['address'])) $dest_address = $data['address'];
+		if(isset($data['deliveryStatus'])) $delivery_status = $data['deliveryStatus'];
+		
+		// add some logic to handle exceptions in this script
+		$database = DatabaseFactory::getFactory()->getConnection();
+		$database->beginTransaction();
+		$sql="UPDATE tbl_outbound_messages SET delivery_timestamp = NOW(), delivery_status=:delivery_status, delivery_notif_type=2,last_updated_on=NOW() WHERE dest_addresses=:dest_address AND correlator=:correlator";// IMPORTANT - note dest_addresses in the where clause (to be visited later)
+		$query = $database->prepare($sql);
+		$query->execute(array(':delivery_status' => $delivery_status , ':dest_address' => $dest_address, ':correlator' => $correlator));	
+		
+		$row_count = $query->rowCount();
+		$database->commit();
+		
+		if ($row_count == 1) {
+			
+            return array("result"=>"0", "resultDesc"=>"Saving successful", "data"=>$data);
+        }
+		
+		return array("result"=>"16", "resultDesc"=>"Hook execution failed", "data"=>$data);
 	}
 }
