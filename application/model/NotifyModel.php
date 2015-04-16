@@ -137,6 +137,8 @@ class NotifyModel
 		
 		$query->execute(array(':service_id' => $service_id , ':link_id' => $link_id, ':trace_unique_id' => $trace_unique_id, ':correlator' => $correlator, ':message' => $message, ':sender_address' => $sender_address, ':dest_address' => $dest_address, ':date_time' => $date_time));	
 		
+		//add last insert id, may be used in the next method calls
+		$data['_lastInsertID'] = $database->lastInsertId();
 		
 		$row_count = $query->rowCount();
 		$database->commit();

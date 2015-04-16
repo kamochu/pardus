@@ -127,4 +127,23 @@ return array(
 	'EMAIL_VERIFICATION_FROM_NAME' => 'My Project',
 	'EMAIL_VERIFICATION_SUBJECT' => 'Account activation for PROJECT XY',
 	'EMAIL_VERIFICATION_CONTENT' => 'Please click on this link to activate your account: ',
+	/**
+	 * Configuration for: SP SDP data
+	 */
+	'SP_ID' => '601555',
+	'SP_PASSWORD' => '@Bcd1234',
+	/**
+	 * Configuration for: SDP Send SMS configurations
+	 */
+	'SEND_SMS_DEFAULT_SERVICE_ENDPOINT' => 'http://196.201.216.14:8310/SendSmsService/services/SendSms',
+	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_FLAG' => 1,
+	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_ENDPOINT' => 'http://192.168.0.13/pardus/delivery/receipt/',
+	'SEND_SMS_MAXIMUM_RECIPIENTS' => 1,
+	/**
+	 * Configuration for: SDP Get Sms Delivery Status configurations
+	 */
+	'GET_DELIVERY_STATUS_DEFAULT_SERVICE_ENDPOINT' => 'http://196.201.216.14:8310/SendSmsService/services/SendSms',
+	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_FLAG' => 1,
+	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_ENDPOINT' => 'http://192.168.0.13/pardus/delivery/receipt/',
+	'SEND_SMS_MAXIMUM_RECIPIENTS' => 1,
 );

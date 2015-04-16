@@ -173,15 +173,16 @@ class DeliveryModel
 		// add some logic to handle exceptions in this script
 		$database = DatabaseFactory::getFactory()->getConnection();
 		$database->beginTransaction();
-		$sql="UPDATE tbl_outbound_messages SET delivery_timestamp = NOW(), delivery_status=:delivery_status, delivery_notif_type=2, delivery_receipt_id =:delivery_receipt_id, last_updated_on=NOW() WHERE dest_addresses=:dest_address AND correlator=:correlator";// IMPORTANT - note dest_addresses in the where clause (to be visited later)
+		$sql="UPDATE tbl_outbound_messages SET delivery_timestamp = NOW(), delivery_status=:delivery_status, delivery_notif_type=2, delivery_receipt_id =:delivery_receipt_id, last_updated_on=NOW() WHERE dest_address=:dest_address AND correlator=:correlator";// IMPORTANT - note dest_addresses in the where clause (to be visited later)
 		$query = $database->prepare($sql);
 		$query->execute(array(':delivery_status' => $delivery_status , ':delivery_receipt_id' => $delivery_receipt_id, ':dest_address' => $dest_address, ':correlator' => $correlator));	
 		
 		$row_count = $query->rowCount();
+		$data['_recordsUpdated'] = $row_count;
 		$database->commit();
 		
-		if ($row_count == 1) {
-			
+		if ($row_count > 0 || $database->errorCode() == "0000")  //success
+		{	
             return array("result"=>"0", "resultDesc"=>"Saving successful", "data"=>$data);
         }
 		
