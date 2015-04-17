@@ -133,7 +133,7 @@ return array(
 	'SP_ID' => '601555',
 	'SP_PASSWORD' => '@Bcd1234',
 	/**
-	 * Configuration for: SDP Send SMS configurations
+	 * Configuration for: SDP SendSms configurations
 	 */
 	'SEND_SMS_DEFAULT_SERVICE_ENDPOINT' => 'http://196.201.216.14:8310/SendSmsService/services/SendSms',
 	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_FLAG' => 1,
@@ -146,4 +146,28 @@ return array(
 	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_FLAG' => 1,
 	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_ENDPOINT' => 'http://192.168.0.13/pardus/delivery/receipt/',
 	'SEND_SMS_MAXIMUM_RECIPIENTS' => 1,
+	/**
+	 * Configuration for: SDP SmsNotificationManager configurations
+	 */
+	'SMS_NOTIFICATION_MANAGER_ENDPOINT' => 'http://196.201.216.14:8310/SmsNotificationManagerService/services/SmsNotificationManager',
+	/**
+	 * Configuration for: Service Manager configurations
+	 * SMS_ON_DEMAND_SERVICE_TYPE on demand service type id, confirm the database configurations
+	 */
+	'SMS_ON_DEMAND_SERVICE_TYPE' => 1,
+	'SMS_SERVICE_ON' => 1,
+	'SMS_SERVICE_OFF' => 0,
+	/**
+	 * Configuration for: Service Configurations - This should be sychroznized with the database parameters
+	 */
+	'SERVICE_STATUS_6013992000001491' => 1,
+	'SERVICE_CODE_6013992000001491' => '29000',
+	'SERVICE_DELIVERY_ENDPOINT_6013992000001491' => 'http://192.168.0.16/pardus/delivery/receipt/',
+	'SERVICE_STATUS_6013992000001492' => 1,
+	'SERVICE_CODE_6013992000001492' => '29111',
+	'SERVICE_DELIVERY_ENDPOINT_6013992000001492' => 'http://192.168.0.16/pardus/delivery/receipt/',
+	'SERVICE_STATUS_6013992000001493' => 1,
+	'SERVICE_CODE_6013992000001493' => '29222',
+	'SERVICE_DELIVERY_ENDPOINT_6013992000001492' => 'http://192.168.0.16/pardus/delivery/receipt/',
+	
 );

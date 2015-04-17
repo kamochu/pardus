@@ -1,7 +1,10 @@
 <?php
 /*
-* The class has untility functions that act as SDP client and perform various basic functions
-* like send sms, reqister end point and stop end point, etc
+* The class has Utility functions on SDP to access services services on; sendSms, 
+* reqister and de-register service end point, getSmsDeliveryStatus, etc
+* This class requires nusoap_client class (see application core folder)
+* 
+* Note: This class needs to be updated to help log nusoap debug information 
 */
 class SDP{
 	
@@ -12,7 +15,7 @@ class SDP{
 	* @return string generated password
 	*/
 	
-	public static function generatePassword($sp_timestamp='')
+	private static function generatePassword($sp_timestamp='')
 	{
 		//check whether the timestamp is set
 		if(!isset($sp_timestamp) || empty($sp_timestamp)) 
@@ -27,7 +30,6 @@ class SDP{
 	* The interface supports sending SMS to one or more recipient(s) in a single request
 	* Maximum number of recipients set in SEND_SMS_MAXIMUM_RECIPIENTS in configuration file
 	*
-	* @parameters
 	* @param string $kmp_spid sp id from SDP
 	* @param string $kmp_sppwd sp password generated for this request 
 	* @param string $kmp_service_id service id
@@ -37,15 +39,13 @@ class SDP{
 	* @param string $kmp_code sender address (short code)
 	* @param string $kmp_message message to be sent
 	*
-	* @return
-	* Associative array with: ResultCode, ResultDesc, and ResultDetails 
-	* ResultDetails - for sucessful code (0), the value is an array and ResultDetails['result'] gives the request identifier that can be used in querying delivery status.
+	* @return array associative array with: ResultCode, ResultDesc, and ResultDetails, ResultDetails and XML sent
 	*/
 	public static function sendSms($kmp_service_id, $kmp_recipients,$kmp_correlator,$kmp_code,$kmp_message,$kmp_linkid=''){
 		
 		$kmp_spid=Config::get('SP_ID'); // sp id from configuration file
 		$kmp_timestamp=date("YmdHis"); //current timestamp
-		$kmp_sppwd=SDP::generatePassword($kmp_timestamp); // password to be passed to SDP
+		$kmp_sppwd=self::generatePassword($kmp_timestamp); // password to be passed to SDP
 	
 		//construct the SOAP request to be sent to the SDP server
 		$bodyxml = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://www.huawei.com.cn/schema/common/v2_1" xmlns:loc="http://www.csapi.org/schema/parlayx/sms/send/v2_2/local"> <soapenv:Header> <v2:RequestSOAPHeader><spId>'.$kmp_spid.'</spId><spPassword>'.$kmp_sppwd.'</spPassword><serviceId>'.$kmp_service_id.'</serviceId><timeStamp>'.$kmp_timestamp.'</timeStamp>';
@@ -62,7 +62,7 @@ class SDP{
 			}
 		}
 		else{
-			return array("ResultCode"=>"4","ResultDesc"=>"Recipient(s) empty.","ResultDetails"=>"No recipient address(es) specified."); 
+			return array('ResultCode'=>"4",'ResultDesc'=>"Recipient(s) empty.",'ResultDetails'=>"No recipient address(es) specified."); 
 		}
 		 
 		$bodyxml.='</v2:RequestSOAPHeader></soapenv:Header><soapenv:Body><loc:sendSms>';
@@ -73,7 +73,7 @@ class SDP{
 			$bodyxml.='<loc:addresses>'.$kmp_recipients.'</loc:addresses>';
 		}
 		else if($count >  Config::get('SEND_SMS_MAXIMUM_RECIPIENTS')){ //too many recipients
-			return array("ResultCode"=>"5","ResultDesc"=>"Too many recipients.","ResultDetails"=>"The number of recipients exceeds the maximum number."); 
+			return array('ResultCode'=>"5",'ResultDesc'=>"Too many recipients.",'ResultDetails'=>"The number of recipients exceeds the maximum number."); 
 		}
 		else{ //more than one recipients
 			foreach ($kmp_recipients as $misdn){
@@ -103,21 +103,21 @@ class SDP{
 		
 		//check for fault and return
 		if ($client->fault) {
-		  return array("ResultCode"=>"1","ResultDesc"=>"SOAP Fault","ResultDetails"=>$result, "request"=>$bodyxml);
+		  return array('ResultCode'=>"1",'ResultDesc'=>'SOAP Fault','ResultDetails'=>$result, "request"=>$bodyxml);
 		}
 		
 		// check for errors and return
 		$err = $client->getError();
 		if ($err) {
-			return array("ResultCode"=>"2","ResultDesc"=>"Error","ResultDetails"=>$err, "request"=>$bodyxml);
+			return array('ResultCode'=>"2",'ResultDesc'=>'Error','ResultDetails'=>$err, "request"=>$bodyxml);
 		}
 		else{
 			//check for fault code
 			if(isset($result['faultcode'])){
-				return array("ResultCode"=>"3","ResultDesc"=>"Fault - ".$result['faultcode'],"ResultDetails"=>$result['faultstring'],"request"=>$bodyxml);
+				return array('ResultCode'=>"3",'ResultDesc'=>'Fault - '.$result['faultcode'],'ResultDetails'=>$result['faultstring'],"request"=>$bodyxml);
 			}
 			//return success
-			return array("ResultCode"=>"0","ResultDesc"=>"Operation Successful.","ResultDetails"=>$result, "request"=>$bodyxml);
+			return array('ResultCode'=>"0",'ResultDesc'=>"Operation Successful.",'ResultDetails'=>$result, "request"=>$bodyxml);
 		}
 	} //end of sendSms method
 	
@@ -126,23 +126,17 @@ class SDP{
 	* @method: getSmsDeliveryStatus - method to get SMS Delivery Status
 	* Supports getting delivery status using either requestIdentifier alone or both requestIdentifier and MSISDN (address)
 	*
-	* @parameters
-	* @param string $kmp_spid
-	* $spPassword
-	* $serviceId
-	* $timeStamp
-	* $requestIdentifier
-	* $msisdn - optional 
+	* @param string $kmp_service_id service id
+	* @param string $kmp_request_identifier request identifier returned as a response to sendSms interface
+	* @param string $kmp_msisdn optional the subscriber number of the recipient of the message sent via sendSms interface
 	*
-	* @return
-	* Associative array with: ResultCode, ResultDesc, and ResultDetails 
-	* ResultDetails - contains additional information. For successful result code (0). The aray will contain delivery status of all the messages sent and referenced by the same $kmp_request_identifier
+	* @return array associative array with: ResultCode, ResultDesc, and ResultDetails, ResultDetails and XML sent
 	*/
 	public static function getSmsDeliveryStatus($kmp_service_id, $kmp_request_identifier, $kmp_msisdn=''){
 		
 		$kmp_spid=Config::get('SP_ID'); // sp id from configuration file
 		$kmp_timestamp=date("YmdHis"); //current timestamp
-		$kmp_sppwd=SDP::generatePassword($kmp_timestamp); // password to be passed to SDP
+		$kmp_sppwd=self::generatePassword($kmp_timestamp); // password to be passed to SDP
 		
 		//setup the initial part of the body xml
 		$bodyxml='<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://www.huawei.com.cn/schema/common/v2_1" xmlns:loc="http://www.csapi.org/schema/parlayx/sms/send/v2_2/local"><soapenv:Header><v2:RequestSOAPHeader><v2:spId>'.$kmp_spid.'</v2:spId><v2:spPassword>'.$kmp_sppwd.'</v2:spPassword><v2:serviceId>'.$kmp_service_id.'</v2:serviceId> <v2:timeStamp>'.$kmp_timestamp.'</v2:timeStamp>';
@@ -157,7 +151,7 @@ class SDP{
 		
 		//requestIdentifier is empty
 		if(empty($kmp_request_identifier)){
-			return array("ResultCode"=>"6","ResultDesc"=>"Missing Request Identifier.","ResultDetails"=>"Request Identifier Parameter is empty");
+			return array('ResultCode'=>"6",'ResultDesc'=>"Missing Request Identifier.",'ResultDetails'=>"Request Identifier Parameter is empty");
 		}
 		
 		//Create the nusoap client and set the parameters, endpoint specified in the client_inc.php
@@ -171,42 +165,120 @@ class SDP{
 		
 		//check for fault and return
 		if ($client->fault) {
-		  return array("ResultCode"=>"1","ResultDesc"=>"SOAP Fault","ResultDetails"=>$result, "xml"=>$bodyxml);
+		  return array('ResultCode'=>"1",'ResultDesc'=>'SOAP Fault','ResultDetails'=>$result, 'xml'=>$bodyxml);
 		}
 		
 		// check for errors and return
 		$err = $client->getError();
 		if ($err) {
-			return array("ResultCode"=>"2","ResultDesc"=>"Error","ResultDetails"=>$err, "xml"=>$bodyxml);
+			return array('ResultCode'=>"2",'ResultDesc'=>'Error','ResultDetails'=>$err, 'xml'=>$bodyxml);
 		}
 		else{
 			//check for fault code
 			if(isset($result['faultcode'])){
-				return array("ResultCode"=>"3","ResultDesc"=>"Fault - ".$result['faultcode'],"ResultDetails"=>$result['faultstring'], "xml"=>$bodyxml);
+				return array('ResultCode'=>"3",'ResultDesc'=>'Fault - '.$result['faultcode'],'ResultDetails'=>$result['faultstring'], 'xml'=>$bodyxml);
 			}
 			//return success
-			return array("ResultCode"=>"0","ResultDesc"=>"Operation Successful.","ResultDetails"=>$result, "xml"=>$bodyxml);
+			return array('ResultCode'=>"0",'ResultDesc'=>"Operation Successful.",'ResultDetails'=>$result, 'xml'=>$bodyxml);
 		}
 	}
 	
 	
 	/*
-	* @method writeToFile - Utility function to write file into disk for logging purposes
-	* @parameter
-	* $file - path/to/file
-	* $data - the data to be written into the file
+	* startSmsNotification - method to send the startSmsNotification request to the SDP server for SMS notify
+	* The interface is used to register the end point that should receive SMS (notifySmsReception)
+	* 
+	* @param string $kmp_service_id service id
+	* @param string $kmp_notify_endpoint the service endpoint that will receive SMS (notifySmsReception interface)
+	* @param string $kmp_correlator correlator
+	* @param string $kmp_code smsServiceActivationNumber or the short code
+	* @param string $kmp_criteria the criteria for receiving the notification 
 	*
-	* @return - none
+	* @return array associative array with: ResultCode, ResultDesc, and ResultDetails, ResultDetails and XML sent
 	*/
-	function writeToFile($file,$data){
-		if (file_exists($file)){
-			file_put_contents($file,  $data, FILE_APPEND);
+	public static function startSmsNotification($kmp_service_id,$kmp_notify_endpoint,$kmp_correlator,$kmp_code,$kmp_criteria=''){
+	
+		$kmp_spid=Config::get('SP_ID'); // sp id from configuration file
+		$kmp_timestamp=date("YmdHis"); //current timestamp
+		$kmp_sppwd=self::generatePassword($kmp_timestamp); // password to be passed to SDP
+		
+		$bodyxml = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://www.huawei.com.cn/schema/common/v2_1" xmlns:loc="http://www.csapi.org/schema/parlayx/sms/notification_manager/v2_3/local"><soapenv:Header><RequestSOAPHeader xmlns="http://www.huawei.com.cn/schema/common/v2_1"><spId>'.$kmp_spid.'</spId><spPassword>'.$kmp_sppwd.'</spPassword><serviceId>'.$kmp_service_id.'</serviceId><timeStamp>'.$kmp_timestamp.'</timeStamp></RequestSOAPHeader></soapenv:Header><soapenv:Body><loc:startSmsNotification><loc:reference><endpoint>'.$kmp_notify_endpoint.'</endpoint><interfaceName>startSmsNotification</interfaceName><correlator>'.$kmp_correlator.'</correlator></loc:reference><loc:smsServiceActivationNumber>'.$kmp_code.'</loc:smsServiceActivationNumber><loc:criteria>'.$kmp_criteria.'</loc:criteria></loc:startSmsNotification></soapenv:Body></soapenv:Envelope>';
+		
+		//create the client
+		$client = new nusoap_client(Config::get('SMS_NOTIFICATION_MANAGER_ENDPOINT'),true);	
+		$bsoapaction = "";
+		$client->soap_defencoding = 'utf-8';
+		$client->useHTTPPersistentConnection();
+		
+		//send the request to the server
+		$result = $client->send($bodyxml, $bsoapaction);
+		
+		//check for fault and return
+		if ($client->fault) {
+		  return array('ResultCode'=>1,'ResultDesc'=>'SOAP Fault','ResultDetails'=>$result, 'xml' => $bodyxml);
+		}
+		
+		// check for errors and return
+		$err = $client->getError();
+		if ($err) {
+			return array('ResultCode'=>2,'ResultDesc'=>'Error','ResultDetails'=>$err, 'xml' => $bodyxml);
 		}
 		else{
-			file_put_contents($file, $data);
+			//check for fault code
+			if(isset($result['faultcode'])){
+				return array('ResultCode'=>'3','ResultDesc'=>'Fault - '.$result['faultcode'],'ResultDetails'=>$result['faultstring'], 'xml' => $bodyxml);
+			}
+			//return success
+			return array('ResultCode'=>0,'ResultDesc'=>'Operation Successful.','ResultDetails'=>$result, 'xml' => $bodyxml);
 		}
 	}
 	
+	
+   /*
+	* startSmsNotification - method to send the startSmsNotification request to the SDP server for SMS notify
+	* The interface is used to register the end point that should receive SMS (notifySmsReception)
+	*
+	* @param string $kmp_service_id service id
+	* @param string $kmp_correlator correlator
+	*
+	* @return array associative array with: ResultCode, ResultDesc, and ResultDetails, ResultDetails
+	*/
+	public static function stopSmsNotification($kmp_service_id, $kmp_correlator)
+	{
+		$kmp_spid=Config::get('SP_ID'); // sp id from configuration file
+		$kmp_timestamp=date("YmdHis"); //current timestamp
+		$kmp_sppwd=self::generatePassword($kmp_timestamp); // password to be passed to SDP
+		
+		$bodyxml = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://www.huawei.com.cn/schema/common/v2_1" xmlns:loc="http://www.csapi.org/schema/parlayx/sms/notification_manager/v2_3/local"><soapenv:Header><v2:RequestSOAPHeader><spId>'.$kmp_spid.'</spId><spPassword>'.$kmp_sppwd.'</spPassword><serviceId>'.$kmp_service_id.'</serviceId><timeStamp>'.$kmp_timestamp.'</timeStamp></v2:RequestSOAPHeader></soapenv:Header><soapenv:Body><loc:stopSmsNotification><correlator>'.$kmp_correlator.'</correlator></loc:stopSmsNotification></soapenv:Body></soapenv:Envelope>';
+		
+		//create the client
+		$client = new nusoap_client(Config::get('SMS_NOTIFICATION_MANAGER_ENDPOINT'),true);	
+		$bsoapaction = "";
+		$client->soap_defencoding = 'utf-8';
+		$client->useHTTPPersistentConnection();
+		
+		//send the request to the server
+		$result = $client->send($bodyxml, $bsoapaction);
+		
+		//check for fault and return
+		if ($client->fault) {
+		  return array('ResultCode'=>1,'ResultDesc'=>'SOAP Fault','ResultDetails'=>$result, 'xml' => $bodyxml);
+		}
+		
+		// check for errors and return
+		$err = $client->getError();
+		if ($err) {
+			return array('ResultCode'=>2,'ResultDesc'=>'Error','ResultDetails'=>$err, 'xml' => $bodyxml);
+		}
+		else{
+			//check for fault code
+			if(isset($result['faultcode'])){
+				return array('ResultCode'=>'3','ResultDesc'=>'Fault - '.$result['faultcode'],'ResultDetails'=>$result['faultstring'], 'xml' => $bodyxml);
+			}
+			//return success
+			return array('ResultCode'=>0,'ResultDesc'=>'Operation Successful.','ResultDetails'=>$result, 'xml' => $bodyxml);
+		}
+	}
 } //end of class
 
 ?>

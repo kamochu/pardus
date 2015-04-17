@@ -17,7 +17,12 @@ class Config
 
 	        self::$config = require $config_file;
         }
-
+		
+		if(!isset( self::$config[$key]))
+		{
+			return false; 
+		}
+		
         return self::$config[$key];
     }
 }
