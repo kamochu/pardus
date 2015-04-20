@@ -49,7 +49,7 @@ class AvatarModel
 	{
 		$database = DatabaseFactory::getFactory()->getConnection();
 
-		$query = $database->prepare("SELECT user_has_avatar FROM users WHERE user_id = :user_id LIMIT 1");
+		$query = $database->prepare("SELECT user_has_avatar FROM tbl_users WHERE user_id = :user_id LIMIT 1");
 		$query->execute(array(':user_id' => $user_id));
 
 		if ($query->fetch()->user_has_avatar) {
@@ -137,9 +137,11 @@ class AvatarModel
 	public static function writeAvatarToDatabase($user_id)
 	{
 		$database = DatabaseFactory::getFactory()->getConnection();
+		$database->beginTransaction();
 
-		$query = $database->prepare("UPDATE users SET user_has_avatar = TRUE WHERE user_id = :user_id LIMIT 1");
+		$query = $database->prepare("UPDATE tbl_users SET user_has_avatar = TRUE WHERE user_id = :user_id LIMIT 1");
 		$query->execute(array(':user_id' => $user_id));
+		$database->commit();
 	}
 
 	/**
@@ -214,14 +216,16 @@ class AvatarModel
         self::deleteAvatarImageFile($userId);
 
         $database = DatabaseFactory::getFactory()->getConnection();
+		$database->beginTransaction();
 
-        $sth = $database->prepare("UPDATE users SET user_has_avatar = 0 WHERE user_id = :user_id LIMIT 1");
+        $sth = $database->prepare("UPDATE tbl_users SET user_has_avatar = 0 WHERE user_id = :user_id LIMIT 1");
         $sth->bindValue(":user_id", (int)$userId, PDO::PARAM_INT);
         $sth->execute();
 
         if ($sth->rowCount() == 1) {
             Session::set('user_avatar_file', self::getPublicUserAvatarFilePathByUserId($userId));
             Session::add("feedback_positive", Text::get("FEEDBACK_AVATAR_IMAGE_DELETE_SUCCESSFUL"));
+			$database->commit();
             return true;
         } else {
             Session::add("feedback_negative", Text::get("FEEDBACK_AVATAR_IMAGE_DELETE_FAILED"));

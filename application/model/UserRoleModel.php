@@ -18,6 +18,7 @@ class UserRoleModel
 	 */
 	public static function changeUserRole($type)
 	{
+		
 		if (!$type) {
 			return false;
 		}
@@ -42,19 +43,21 @@ class UserRoleModel
 	public static function saveRoleToDatabase($type)
 	{
 		// if $type is not 1 or 2
-		if (!in_array($type, [1, 2])) {
+		if ($type != 1 && $type != 2) {
 			return false;
 		}
 
 		$database = DatabaseFactory::getFactory()->getConnection();
+		$database->beginTransaction();
 
-		$query = $database->prepare("UPDATE users SET user_account_type = :new_type WHERE user_id = :user_id LIMIT 1");
+		$query = $database->prepare("UPDATE tbl_users SET user_account_type = :new_type WHERE user_id = :user_id LIMIT 1");
 		$query->execute(array(
 			':new_type' => $type,
 			':user_id' => Session::get('user_id')
 		));
 
 		if ($query->rowCount() == 1) {
+			$database->commit();
 			// set account type in session
 			Session::set('user_account_type', $type);
 			return true;

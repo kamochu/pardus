@@ -25,7 +25,7 @@ class ServiceController extends Controller
      */
 	 public function enable()
 	 {
-		$resultData=ServiceManagerModel::enable(Request::get('service_id'));
+		$resultData=ServiceModel::enable(Request::get('service_id'));
 		print_r($resultData);
 		//render the view and pass the raw post data
         $this->View->renderWithoutHeaderAndFooter('servicemanager/enable_disable',$resultData);
@@ -37,7 +37,7 @@ class ServiceController extends Controller
      */
 	 public function disable()
 	 {
-		 $resultData=ServiceManagerModel::disable(Request::get('service_id'));
+		 $resultData=ServiceModel::disable(Request::get('service_id'));
 		//render the view and pass the raw post data
         $this->View->renderWithoutHeaderAndFooter('servicemanager/enable_disable',$resultData);
 	 }

@@ -19,7 +19,7 @@ class UserModel
     {
         $database = DatabaseFactory::getFactory()->getConnection();
 
-        $sql = "SELECT user_id, user_name, user_email, user_active, user_has_avatar FROM users";
+        $sql = "SELECT user_id, user_name, user_email, user_active, user_has_avatar FROM tbl_users";
         $query = $database->prepare($sql);
         $query->execute();
 
@@ -47,7 +47,7 @@ class UserModel
         $database = DatabaseFactory::getFactory()->getConnection();
 
         $sql = "SELECT user_id, user_name, user_email, user_active, user_has_avatar
-                FROM users WHERE user_id = :user_id LIMIT 1";
+                FROM tbl_users WHERE user_id = :user_id LIMIT 1";
         $query = $database->prepare($sql);
         $query->execute(array(':user_id' => $user_id));
 
@@ -75,7 +75,7 @@ class UserModel
     {
         $database = DatabaseFactory::getFactory()->getConnection();
 
-        $query = $database->prepare("SELECT user_id, user_name, user_email FROM users
+        $query = $database->prepare("SELECT user_id, user_name, user_email FROM tbl_users
                                      WHERE (user_name = :user_name_or_email OR user_email = :user_name_or_email)
                                            AND user_provider_type = :provider_type LIMIT 1");
         $query->execute(array(':user_name_or_email' => $user_name_or_email, ':provider_type' => 'DEFAULT'));
@@ -94,7 +94,7 @@ class UserModel
     {
         $database = DatabaseFactory::getFactory()->getConnection();
 
-        $query = $database->prepare("SELECT user_id FROM users WHERE user_name = :user_name LIMIT 1");
+        $query = $database->prepare("SELECT user_id FROM tbl_users WHERE user_name = :user_name LIMIT 1");
         $query->execute(array(':user_name' => $user_name));
         if ($query->rowCount() == 0) {
             return false;
@@ -113,7 +113,7 @@ class UserModel
     {
         $database = DatabaseFactory::getFactory()->getConnection();
 
-        $query = $database->prepare("SELECT user_id FROM users WHERE user_email = :user_email LIMIT 1");
+        $query = $database->prepare("SELECT user_id FROM tbl_users WHERE user_email = :user_email LIMIT 1");
         $query->execute(array(':user_email' => $user_email));
         if ($query->rowCount() == 0) {
             return false;
@@ -132,10 +132,12 @@ class UserModel
     public static function saveNewUserName($user_id, $new_user_name)
     {
         $database = DatabaseFactory::getFactory()->getConnection();
+		$database->beginTransaction();//added the commit leg
 
-        $query = $database->prepare("UPDATE users SET user_name = :user_name WHERE user_id = :user_id LIMIT 1");
+        $query = $database->prepare("UPDATE tbl_users SET user_name = :user_name WHERE user_id = :user_id LIMIT 1");
         $query->execute(array(':user_name' => $new_user_name, ':user_id' => $user_id));
         if ($query->rowCount() == 1) {
+			$database->commit();//added the commit leg
             return true;
         }
         return false;
@@ -152,11 +154,13 @@ class UserModel
     public static function saveNewEmailAddress($user_id, $new_user_email)
     {
         $database = DatabaseFactory::getFactory()->getConnection();
+		$database->beginTransaction();//added the commit leg
 
-        $query = $database->prepare("UPDATE users SET user_email = :user_email WHERE user_id = :user_id LIMIT 1");
+        $query = $database->prepare("UPDATE tbl_users SET user_email = :user_email WHERE user_id = :user_id LIMIT 1");
         $query->execute(array(':user_email' => $new_user_email, ':user_id' => $user_id));
         $count =  $query->rowCount();
         if ($count == 1) {
+			$database->commit(); // add the commit leg
             return true;
         }
         return false;
@@ -265,7 +269,7 @@ class UserModel
     {
         $database = DatabaseFactory::getFactory()->getConnection();
 
-        $sql = "SELECT user_id FROM users WHERE user_name = :user_name AND user_provider_type = :provider_type LIMIT 1";
+        $sql = "SELECT user_id FROM tbl_users WHERE user_name = :user_name AND user_provider_type = :provider_type LIMIT 1";
         $query = $database->prepare($sql);
 
         // DEFAULT is the marker for "normal" accounts (that have a password etc.)
@@ -289,7 +293,7 @@ class UserModel
 
         $sql = "SELECT user_id, user_name, user_email, user_password_hash, user_active, user_account_type,
                        user_failed_logins, user_last_failed_login
-                  FROM users
+                  FROM tbl_users
                  WHERE (user_name = :user_name OR user_email = :user_name)
                        AND user_provider_type = :provider_type
                  LIMIT 1";
@@ -318,7 +322,7 @@ class UserModel
         // get real token from database (and all other data)
         $query = $database->prepare("SELECT user_id, user_name, user_email, user_password_hash, user_active,
                                           user_account_type,  user_has_avatar, user_failed_logins, user_last_failed_login
-                                     FROM users
+                                     FROM tbl_users
                                      WHERE user_id = :user_id
                                        AND user_remember_me_token = :user_remember_me_token
                                        AND user_remember_me_token IS NOT NULL
