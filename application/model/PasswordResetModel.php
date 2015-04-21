@@ -61,8 +61,9 @@ class PasswordResetModel
 	public static function setPasswordResetDatabaseToken($user_name, $user_password_reset_hash, $temporary_timestamp)
 	{
 		$database = DatabaseFactory::getFactory()->getConnection();
+		$database->beginTransaction();
 
-		$sql = "UPDATE users
+		$sql = "UPDATE tbl_users
                 SET user_password_reset_hash = :user_password_reset_hash, user_password_reset_timestamp = :user_password_reset_timestamp
                 WHERE user_name = :user_name AND user_provider_type = :provider_type LIMIT 1";
 		$query = $database->prepare($sql);
@@ -73,6 +74,7 @@ class PasswordResetModel
 
 		// check if exactly one row was successfully changed
 		if ($query->rowCount() == 1) {
+			$database->commit();
 			return true;
 		}
 
@@ -123,7 +125,7 @@ class PasswordResetModel
 
 		// check if user-provided username + verification code combination exists
 		$sql = "SELECT user_id, user_password_reset_timestamp
-                  FROM users
+                  FROM tbl_users
                  WHERE user_name = :user_name
                        AND user_password_reset_hash = :user_password_reset_hash
                        AND user_provider_type = :user_provider_type
@@ -169,8 +171,9 @@ class PasswordResetModel
 	public static function saveNewUserPassword($user_name, $user_password_hash, $user_password_reset_hash)
 	{
 		$database = DatabaseFactory::getFactory()->getConnection();
+		$database->beginTransaction();
 
-		$sql = "UPDATE users SET user_password_hash = :user_password_hash, user_password_reset_hash = NULL,
+		$sql = "UPDATE tbl_users SET user_password_hash = :user_password_hash, user_password_reset_hash = NULL,
                        user_password_reset_timestamp = NULL
                  WHERE user_name = :user_name AND user_password_reset_hash = :user_password_reset_hash
                        AND user_provider_type = :user_provider_type LIMIT 1";
@@ -179,9 +182,15 @@ class PasswordResetModel
 			':user_password_hash' => $user_password_hash, ':user_name' => $user_name,
 			':user_password_reset_hash' => $user_password_reset_hash, ':user_provider_type' => 'DEFAULT'
 		));
+		
+		if($query->rowCount() == 1 )
+		{
+			$database->commit();
+			return true;
+		}
 
 		// if one result exists, return true, else false. Could be written even shorter btw.
-		return ($query->rowCount() == 1 ? true : false);
+		return false;
 	}
 
 	/**

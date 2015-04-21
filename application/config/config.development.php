@@ -28,6 +28,7 @@ return array(
 	 * Configuration for: Folders
 	 * Usually there's no reason to change this.
 	 */
+	'PATH_CLASS' => realpath(dirname(__FILE__).'/../../') . '/application/core/',
 	'PATH_CONTROLLER' => realpath(dirname(__FILE__).'/../../') . '/application/controller/',
 	'PATH_VIEW' => realpath(dirname(__FILE__).'/../../') . '/application/view/',
 	/**
@@ -52,10 +53,10 @@ return array(
 	 * DB_CHARSET The charset, necessary for security reasons. Check Database.php class for more info.
 	 */
 	'DB_TYPE' => 'mysql',
-	'DB_HOST' => '127.0.0.1',
+	'DB_HOST' => '192.168.0.15',
 	'DB_NAME' => 'huge',
 	'DB_USER' => 'root',
-	'DB_PASS' => '12345678',
+	'DB_PASS' => 'admin',
 	'DB_PORT' => '3306',
 	'DB_CHARSET' => 'utf8',
 	/**
@@ -126,4 +127,47 @@ return array(
 	'EMAIL_VERIFICATION_FROM_NAME' => 'My Project',
 	'EMAIL_VERIFICATION_SUBJECT' => 'Account activation for PROJECT XY',
 	'EMAIL_VERIFICATION_CONTENT' => 'Please click on this link to activate your account: ',
+	/**
+	 * Configuration for: SP SDP data
+	 */
+	'SP_ID' => '601555',
+	'SP_PASSWORD' => '@Bcd1234',
+	/**
+	 * Configuration for: SDP SendSms configurations
+	 */
+	'SEND_SMS_DEFAULT_SERVICE_ENDPOINT' => 'http://196.201.216.14:8310/SendSmsService/services/SendSms',
+	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_FLAG' => 1,
+	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_ENDPOINT' => 'http://192.168.0.13/pardus/delivery/receipt/',
+	'SEND_SMS_MAXIMUM_RECIPIENTS' => 1,
+	/**
+	 * Configuration for: SDP Get Sms Delivery Status configurations
+	 */
+	'GET_DELIVERY_STATUS_DEFAULT_SERVICE_ENDPOINT' => 'http://196.201.216.14:8310/SendSmsService/services/SendSms',
+	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_FLAG' => 1,
+	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_ENDPOINT' => 'http://192.168.0.13/pardus/delivery/receipt/',
+	'SEND_SMS_MAXIMUM_RECIPIENTS' => 1,
+	/**
+	 * Configuration for: SDP SmsNotificationManager configurations
+	 */
+	'SMS_NOTIFICATION_MANAGER_ENDPOINT' => 'http://196.201.216.14:8310/SmsNotificationManagerService/services/SmsNotificationManager',
+	/**
+	 * Configuration for: Service Manager configurations
+	 * SMS_ON_DEMAND_SERVICE_TYPE on demand service type id, confirm the database configurations
+	 */
+	'SMS_ON_DEMAND_SERVICE_TYPE' => 1,
+	'SMS_SERVICE_ON' => 1,
+	'SMS_SERVICE_OFF' => 0,
+	/**
+	 * Configuration for: Service Configurations - This should be sychroznized with the database parameters
+	 */
+	'SERVICE_STATUS_6013992000001491' => 1,
+	'SERVICE_CODE_6013992000001491' => '29000',
+	'SERVICE_DELIVERY_ENDPOINT_6013992000001491' => 'http://192.168.0.16/pardus/delivery/receipt/',
+	'SERVICE_STATUS_6013992000001492' => 1,
+	'SERVICE_CODE_6013992000001492' => '29111',
+	'SERVICE_DELIVERY_ENDPOINT_6013992000001492' => 'http://192.168.0.16/pardus/delivery/receipt/',
+	'SERVICE_STATUS_6013992000001493' => 1,
+	'SERVICE_CODE_6013992000001493' => '29222',
+	'SERVICE_DELIVERY_ENDPOINT_6013992000001492' => 'http://192.168.0.16/pardus/delivery/receipt/',
+	
 );
