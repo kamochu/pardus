@@ -62,16 +62,7 @@ class SendModel
      */
 	protected static function decode($data)
 	{
-		//dummy data
-		$data['service_id'] = "6013992000001491";
-		$data['link_id'] = "11".date("YmdHisu");
-		$data['linked_incoming_msg_id'] = "26";
-		$data['dest_address'] = "tel:722".date("YmdHis");
-		$data['sender_address'] = "292".date("H");
-		$data['correlator'] = "12".date("YmdHisu");
-		$data['batch_id'] = date("YmdH");
-		$data['message'] = "This is a test message 12".date("YmdHisu");
-		
+		//add some logic to normalize the sender and destination address
 		// add some logic to get data request post data
 		return array('result'=>0, 'resultDesc'=>'Data processing', 'data'=>$data);
 	}

@@ -15,11 +15,27 @@ class SendController extends Controller
      */
     public function index()
     {
-		//receive the post data
-		//$raw_post_data = file_get_contents("php://input");
+		//initialize data 
+		$data = array();
+		$data['service_id'] = '';
+		$data['link_id'] = '';
+		$data['linked_incoming_msg_id'] = '';
+		$data['dest_address'] = '';
+		$data['sender_address'] = '';
+		$data['correlator'] = '';
+		$data['batch_id'] = '';
+		$data['message'] = '';
 		
-		//process the data
-		$data['dummy']="data";
+		//get the request data - get
+		$data['service_id'] = Request::get('service_id',true);
+		$data['link_id'] = Request::get('link_id',true);
+		$data['linked_incoming_msg_id'] = Request::get('linked_incoming_msg_id',true);
+		$data['dest_address'] = Request::get('dest_address',true);
+		$data['sender_address'] = Request::get('sender_address',true);
+		$data['correlator'] = Request::get('correlator',true);
+		$data['message'] = Request::get('message',true);
+		
+		//call the sender model to process
 		$resultData = SendModel::process($data);
 		
 		if($resultData['result'] == 0)  // successful processing

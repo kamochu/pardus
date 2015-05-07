@@ -49,8 +49,6 @@ class MessageModel
 		$database = DatabaseFactory::getFactory()->getConnection();
 
         $query = $database->prepare($sql);
-        //$query->execute(array(':start_date'=>$start_date, ':end_date'=>$end_date, ":subscriber_id"=>$subscriber_id, ':short_code'=>$short_code, ':service_id'=>$service_id, ':start_index'=>$start_index, ':limit'=>$limit));
-		
 		$query->execute($parameters);
         
 		$messages = $query->fetchAll();
@@ -237,6 +235,4 @@ class MessageModel
         }
 		return array('result'=>1, 'resultDesc'=>'No records found.', '_recordsRetrieved' => $row_count, 'messages'=>$messages);
 	} 
-	
-	
 }

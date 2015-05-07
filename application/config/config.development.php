@@ -53,8 +53,8 @@ return array(
 	 * DB_CHARSET The charset, necessary for security reasons. Check Database.php class for more info.
 	 */
 	'DB_TYPE' => 'mysql',
-	'DB_HOST' => '192.168.0.15',
-	'DB_NAME' => 'huge',
+	'DB_HOST' => 'localhost',
+	'DB_NAME' => 'sematel_ssg',
 	'DB_USER' => 'root',
 	'DB_PASS' => 'admin',
 	'DB_PORT' => '3306',
@@ -130,14 +130,14 @@ return array(
 	/**
 	 * Configuration for: SP SDP data
 	 */
-	'SP_ID' => '601555',
-	'SP_PASSWORD' => '@Bcd1234',
+	'SP_ID' => '601320',
+	'SP_PASSWORD' => 'Smtel#2015',
 	/**
 	 * Configuration for: SDP SendSms configurations
 	 */
 	'SEND_SMS_DEFAULT_SERVICE_ENDPOINT' => 'http://196.201.216.14:8310/SendSmsService/services/SendSms',
 	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_FLAG' => 1,
-	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_ENDPOINT' => 'http://192.168.0.13/pardus/delivery/receipt/',
+	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_ENDPOINT' => 'http://197.254.6.138/xtracash/test/notify.php',
 	'SEND_SMS_MAXIMUM_RECIPIENTS' => 1,
 	/**
 	 * Configuration for: SDP Get Sms Delivery Status configurations
@@ -160,6 +160,9 @@ return array(
 	/**
 	 * Configuration for: Service Configurations - This should be sychroznized with the database parameters
 	 */
+	'SERVICE_STATUS_6013202000002998' => 1,
+	'SERVICE_CODE_6013202000002998' => '901',
+	'SERVICE_DELIVERY_ENDPOINT_6013202000002998' => 'http://197.254.6.138/xtracash/test/notify.php',
 	'SERVICE_STATUS_6013992000001491' => 1,
 	'SERVICE_CODE_6013992000001491' => '29000',
 	'SERVICE_DELIVERY_ENDPOINT_6013992000001491' => 'http://192.168.0.16/pardus/delivery/receipt/',
