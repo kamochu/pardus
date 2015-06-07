@@ -1,47 +1,60 @@
 <?php
+namespace Ssg\Model;
+
+use \Ssg\Core\Config;
+use \Ssg\Core\SDP;
+use \Ssg\Core\Model;
+use \Ssg\Core\DatabaseFactory;
+use \Psr\Log\LoggerInterface;
+use \Psr\Log\NullLogger;
+use \Exception;
 
 /**
  * ServiceManagerModel - offers utility functions to manage service
  *
  */
-class ServiceModel
+class ServiceModel extends Model
 {
+	/**
+     * Construct this object by extending the basic Model class
+     */
+    public function __construct(LoggerInterface $logger = null)
+    {
+        parent::__construct($logger);
+    }
+	
 	/**
      * Enable service
      *
      * @param string $service_id the service id
 	 * @return array containing query result and service data
      */
-	public static function enable($service_id)
+	public function enable($service_id)
 	{
 		//get the serivce parameters from the database 
 		$response =  self::getService($service_id);
 		
-		//confirm the status of the service
-		if($response['result'] != 0) // not successful
-		{
+		//confirm the status of the service// not successful
+		if ($response['result'] != 0) {
 			return $response; 
 		}
 		
 		//extract service data
 		$service_data = $response['service'];
 		
-		if($service_data->status == Config::get('SMS_SERVICE_ON'))
-		{
+		if ($service_data->status == Config::get('SMS_SERVICE_ON')) {
 			 return array('result' => 9 , 'resultDesc' => 'Service already enabled.', 'service' => $service_data); 
 		}
 		
 		//check whether the service requires sending a request to SDP for on demand service type
-		if($service_data->service_type == Config::get('SMS_ON_DEMAND_SERVICE_TYPE')) 
-		{
+		if ($service_data->service_type == Config::get('SMS_ON_DEMAND_SERVICE_TYPE')) {
 			//send request to SDP if application 	
 			$response = self::sendStartSmsNotification($service_data);
-			if($response['result'] == 0) //success
-			{
+			
+			//success
+			if ($response['result'] == 0) {
 				$service_data->status = Config::get('SMS_SERVICE_ON'); // activate
-			}
-			else
-			{
+			} else {
 				return $response; // return as is
 			}
 		}
@@ -50,8 +63,10 @@ class ServiceModel
 			$service_data->status = Config::get('SMS_SERVICE_ON'); // activate
 		}
 		
+		$response['service']=$service_data;
+		
 		//update the database
-		$response = self::saveServiceStatus($service_data);
+		$response = self::saveServiceStatus($response);
 		
 		//update the configuration file - Future task
 		
@@ -65,7 +80,7 @@ class ServiceModel
      * @param string $service_id service id
 	 * @return bool TRUE if enable is successful, FALSE if enable fails
      */
-	public static function disable($service_id)
+	public function disable($service_id)
 	{
 		//get the serivce parameters from the database 
 		$response =  self::getService($service_id);
@@ -86,9 +101,10 @@ class ServiceModel
 		
 		//check whether the service requires sending a request to SDP for on demand service type
 		if($service_data->service_type == Config::get('SMS_ON_DEMAND_SERVICE_TYPE')) 
-		{
+		{	
 			//send request to SDP if application 	
 			$response = self::sendStopSmsNotification($service_data);
+			
 			if($response['result'] == 0) //success
 			{
 				$service_data->status = Config::get('SMS_SERVICE_OFF'); // disable
@@ -103,8 +119,10 @@ class ServiceModel
 			$service_data->status = Config::get('SMS_SERVICE_OFF'); // disable
 		}
 		
+		$response['service'] = $service_data;
+		
 		//update the database
-		$response = self::saveServiceStatus($service_data);
+		$response = self::saveServiceStatus($response);
 		
 		//update the configuration file - Future task
 		
@@ -119,25 +137,24 @@ class ServiceModel
      * @param array $service_data service data to be used in sending request
 	 * @return bool TRUE if successful an FALSE if it fails
      */
-	private static function sendStartSmsNotification($service_data)
+	private function sendStartSmsNotification($service_data)
 	{
 		//generate correlator - change this to call the generate correlator method
 		$service_data->correlator = date("YmdHis"); 
 		
 		//send the request to SDP
-		$response = SDP::startSmsNotification($service_data->service_id, $service_data->service_endpoint, 
-		$service_data->correlator, $service_data->short_code, $service_data->citeria);
+		$response = SDP::startSmsNotification($this->logger, $service_data->service_id, $service_data->service_endpoint, 
+		$service_data->correlator, $service_data->short_code, $service_data->criteria);
 		
-		//check response
-		if($response['ResultCode'] == 0 ) // success
-		{
-			return array('result' => 0, 'resultDesc' => 'Successful.', 'service' => $service_data); 
+		//check response // success
+		if($response['ResultCode'] == 0 ) {
+			return array('result' => 0, 'resultDesc' => 'Successful.', 'service' => $service_data, 'sdp_data' => $response); 
 		}
 		
 		//return 
 		return  array('result' => 1, 
-			'resultDesc' => 'Start sms failed ('.$response['ResultCode'].' - '.$response['ResultDesc'].' - '.$response['ResultDetails'].').', 
-			'service' => $service_data); ;
+			'resultDesc' => 'Start sms failed('.$response['ResultCode'].' - '.$response['ResultDesc'].' - '.$response['ResultDetails'].').', 
+			'service' => $service_data, 'sdp_data' => $response); ;
 	}
 	
 	
@@ -147,21 +164,18 @@ class ServiceModel
      * @param array $service_data service data to be used in sending request
 	 * @return bool TRUE if successful an FALSE if it fails
      */
-	private static function sendStopSmsNotification($service_data)
+	private function sendStopSmsNotification($service_data)
 	{
 		//send the request to SDP
-		$response = SDP::stopSmsNotification($service_data->service_id, $service_data->correlator);
+		$response = SDP::stopSmsNotification($this->logger, $service_data->service_id, $service_data->correlator);
 		
-				//check response
+		//check response
 		if($response['ResultCode'] == 0 ) // success
 		{
-			return array('result' => 0, 'resultDesc' => 'Successful.', 'service' => $service_data); 
+			return array('result' => 0, 'resultDesc' => 'Successful.', 'service' => $service_data, 'sdp_data' => $response); 
 		}
-		
 		//return 
-		return  array('result' => 1, 
-			'resultDesc' => 'Stop sms failed ('.$response['ResultCode'].' - '.$response['ResultDesc'].' - '.$response['ResultDetails'].').', 
-			'service' => $service_data); ;
+		return  array('result' => 1,'resultDesc' => 'Stop sms failed('.$response['ResultCode'].' - '.$response['ResultDesc'].' - '.$response['ResultDetails'].').', 'service' => $service_data, 'sdp_data' => $response); ;
 	}
 	
 	
@@ -182,9 +196,14 @@ class ServiceModel
      * @param string $service_id service id
 	 * @return array containing query result and service data
      */
-	public static function getService($service_id)
+	public function getService($service_id)
 	{	
-		 $database = DatabaseFactory::getFactory()->getConnection();
+		$database=null;
+		try {
+			$database = DatabaseFactory::getFactory()->getConnection();
+		} catch (Exception $ex) {
+			return  array('result' => 3, 'resultDesc' => 'Cannot connect to the database. Error: '.$ex->getMessage()); 
+		}
 
         $sql = "SELECT id, service_id, service_name, service_type, short_code, service_endpoint, 
 				criteria, delivery_notification_endpoint, interface_name, correlator, status
@@ -209,30 +228,68 @@ class ServiceModel
      * @param string $service_data service data
 	 * @return array containing query result and service data
      */
-	private static function saveServiceStatus($service_data)
+	private function saveServiceStatus($response)
 	{
 		//get the parameters to be used in saving 
-		$service_id = $service_data->service_id;
-		$correlator =$service_data->correlator;
-		$status =$service_data->status;
+		$service_id = $response['service']->service_id;
+		$correlator =$response['service']->correlator;
+		$status =$response['service']->status;
 		
-		// add some logic to handle exceptions in this script
-		$database = DatabaseFactory::getFactory()->getConnection();
-		$database->beginTransaction();
-		$sql='UPDATE tbl_services SET status=:status, correlator=:correlator, last_updated_on = NOW() WHERE service_id=:service_id';
-		$query = $database->prepare($sql);
+		//initialize the database connection
+		$database=null;
+		$errorCode='';
+		try {
+			$database = DatabaseFactory::getFactory()->getConnection();
+		} catch (Exception $ex) {
+			$this->logger->error(
+				'{class_mame}|{method_name}|{service_id}|cannot connect to database|{exception}',
+				array(
+					'class_mame'=>__CLASS__,
+					'method_name'=>__FUNCTION__,
+					'service_id'=>$service_id,
+					'exception'=>$ex->getMessage()
+				)
+			);
+			return  array('result' => 3, 'resultDesc' => 'Cannot connect to the database. Error: '.$ex->getMessage()); 
+		}
 		
-		$query->execute(array(':service_id' => $service_id , ':correlator' => $correlator, ':status' => $status));
-		
-		$row_count = $query->rowCount();
-		$errorCode = $database->errorCode();
-		$database->commit();
-		
-		if ($row_count == 1) 
-		{	
-			return array('result'=>0, 'resultDesc'=>'Saving successful', 'service'=>$service_data);
-        }
-		return array('result'=>1, 'resultDesc'=>'Saving record failed - '.$errorCode, 'service'=>$service_data);
+		//saving the data
+		try{
+			$database->beginTransaction();
+			$sql='UPDATE tbl_services SET status=:status, correlator=:correlator, last_updated_on = NOW() WHERE service_id=:service_id';
+			$query = $database->prepare($sql);
+			
+			//execute the query and check the status
+			if ($query->execute(array(':service_id' => $service_id , ':correlator' => $correlator, ':status' => $status))) {
+				$row_count = $query->rowCount();
+				$errorCode = $database->errorCode();
+				$database->commit();
+				
+				if ($row_count == 1) {	
+					$response['resultDesc'] = 'Saving successful';
+					return $response;
+				}
+				
+			}else{
+				$this->logger->error(
+					'{class_mame}|{method_name}|{service_id}|error executing the query|{query}|bind_parameters:{bind_params}',
+					array(
+						'class_mame'=>__CLASS__,
+						'method_name'=>__FUNCTION__,
+						'service_id'=>$service_id,
+						'query'=>$sql,
+						'bind_params'=>implode(',',array(':service_id' => $service_id , ':correlator' => $correlator, ':status' => $status))
+					)
+				);
+				return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 
+			}
+		} catch (PDOException $e) {
+			return  array('result' => 4, 'resultDesc' => 'Error executing a query. Error: '.$e->getMessage()); 
+		}
+		//defauled 
+		$response['result'] = 'Saving successful';
+		$response['resultDesc'] = 'Saving successful';
+		return $response;
 	}
 	
 	
@@ -242,7 +299,7 @@ class ServiceModel
      * @param string $service_data service data
 	 * @return array containing query result and service data
      */
-	public static function addService($service_data)
+	public function addService($service_data)
 	{
 		//initialize service data
 		$service_id="";
@@ -360,7 +417,7 @@ VALUES(:service_id,:service_name,:service_type,:short_code,:criteria,:service_en
      * @param string $service_id service data
 	 * @return array containing query result and service data
      */
-	public static function deleteService($service_id)
+	public function deleteService($service_id)
 	{
 		//check whether ther service exists
 		$query_result = self::getService($service_id);
@@ -395,21 +452,63 @@ VALUES(:service_id,:service_name,:service_type,:short_code,:criteria,:service_en
 	 * 
 	 * @return array containing query result and service data
      */
-	public static function getAllServices()
+	public function getServices($start_index=0, $limit=10, $order='DESC')
 	{
-		$database = DatabaseFactory::getFactory()->getConnection();
-
-        $sql = "SELECT id, service_id, service_name, service_type, short_code, criteria, service_endpoint, delivery_notification_endpoint, interface_name, correlator, status, created_on, last_updated_on, last_updated_by FROM tbl_services";
-        $query = $database->prepare($sql);
-        $query->execute();
-
-        // fetchAll() is the PDO method that gets all result rows
-         $services = $query->fetchAll();
+        $sql = 'SELECT id, service_id, service_name, service_type, short_code, criteria, service_endpoint, delivery_notification_endpoint, interface_name, correlator, status, created_on, last_updated_on, last_updated_by FROM tbl_services ORDER BY id '.$order.' LIMIT '.$start_index.', '.$limit;
 		
-		if ($query->rowCount() > 0) 
-		{	
-			return array('result'=>0, 'resultDesc'=>'Records retrieved successfully.', 'services'=>$services);
-        }
+		// add some logic to handle exceptions in this script
+		$row_count=0; 
+		$services='';
+		$database=null;
+		try {
+			$database = DatabaseFactory::getFactory()->getConnection();
+		} catch (Exception $ex) {
+			$this->logger->error(
+				'{class_mame}|{method_name}|{service_id}|PDOException|{error}|{query}|bind_parameters:{bind_params}',
+				array(
+					'class_mame'=>__CLASS__,
+					'method_name'=>__FUNCTION__,
+					'error'=>$e->getMessage()
+				)
+			);
+			return  array('result' => 3, 'resultDesc' => 'Cannot connect to the database. Error: '.$ex->getMessage()); 
+		}
+		
+		try {	
+			$query = $database->prepare($sql);	
+			if ($query->execute()) {
+				// fetchAll() is the PDO method that gets all result rows
+		        $services = $query->fetchAll();
+				$row_count = $query->rowCount();
+				
+				if ($row_count > 0)  {	
+					return array('result'=>0, 'resultDesc'=>'Records retrieved successfully.', '_recordsRetrieved' => $row_count, 'services'=>$services );
+				}
+			} else {	
+				$this->logger->error(
+					'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}',
+					array(
+						'class_mame'=>__CLASS__,
+						'method_name'=>__FUNCTION__,
+						'error'=>$database->errorCode(),
+						'query'=>$sql
+					)
+				);
+				return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 
+			}
+		} catch (PDOException $e) {
+			$this->logger->error(
+				'{class_mame}|{method_name}|{service_id}|PDOException|{error}|{query}',
+				array(
+					'class_mame'=>__CLASS__,
+					'method_name'=>__FUNCTION__,
+					'error'=>$e->getMessage(),
+					'query'=>$sql
+				)
+			);
+			return  array('result' => 4, 'resultDesc' => 'Error executing a query. Error: '.$e->getMessage()); 
+		}
+		
 		return array('result'=>1, 'resultDesc'=>'No records found - '.$errorCode, 'services'=>$services);
 	} 
 }

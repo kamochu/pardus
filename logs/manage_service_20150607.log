@@ -1,0 +1,2 @@
+2015-06-07T00:59:33+02:00|DEBUG|service|Ssg\Controller\ServiceController|enable|6013202000002998|enable service request
+2015-06-07T00:59:41+02:00|INFO|service|Ssg\Controller\ServiceController|enable|6013202000002998|enable service result|result:9|result_desc:Service already enabled.

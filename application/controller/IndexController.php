@@ -1,4 +1,7 @@
 <?php
+namespace Ssg\Controller;
+
+use Ssg\Core\Controller;
 
 class IndexController extends Controller
 {

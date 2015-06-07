@@ -28,9 +28,16 @@ return array(
 	 * Configuration for: Folders
 	 * Usually there's no reason to change this.
 	 */
-	'PATH_CLASS' => realpath(dirname(__FILE__).'/../../') . '/application/core/',
-	'PATH_CONTROLLER' => realpath(dirname(__FILE__).'/../../') . '/application/controller/',
-	'PATH_VIEW' => realpath(dirname(__FILE__).'/../../') . '/application/view/',
+	'PATH_CLASS' => realpath(dirname(__FILE__).'/../../') . '/Application/Core/',
+	'PATH_CONTROLLER' => realpath(dirname(__FILE__).'/../../') . '/Application/Controller/',
+	'PATH_VIEW' => realpath(dirname(__FILE__).'/../../') . '/Application/View/',
+	//dirname(__FILE__).'/../../vendor/log4php/Logger.php';
+	/**
+	 * Configuration for: logger interface
+	 * Used by the log4php library
+	 */
+	'LOG4PHP_CONFIG' => realpath(dirname(__FILE__)) . '/log4php_config.xml',
+	'LOG4PHP_LOGGER_FILE' => realpath(dirname(__FILE__).'/../../') . '/vendor/log4php/Logger.php',
 	/**
 	 * Configuration for: Avatar paths
 	 * Internal path to save avatars. Make sure this folder is writable. The slash at the end is VERY important!
@@ -137,15 +144,12 @@ return array(
 	 */
 	'SEND_SMS_DEFAULT_SERVICE_ENDPOINT' => 'http://196.201.216.14:8310/SendSmsService/services/SendSms',
 	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_FLAG' => 1,
-	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_ENDPOINT' => 'http://197.254.6.138/xtracash/test/notify.php',
+	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_ENDPOINT' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
 	'SEND_SMS_MAXIMUM_RECIPIENTS' => 1,
 	/**
 	 * Configuration for: SDP Get Sms Delivery Status configurations
 	 */
 	'GET_DELIVERY_STATUS_DEFAULT_SERVICE_ENDPOINT' => 'http://196.201.216.14:8310/SendSmsService/services/SendSms',
-	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_FLAG' => 1,
-	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_ENDPOINT' => 'http://192.168.0.13/pardus/delivery/receipt/',
-	'SEND_SMS_MAXIMUM_RECIPIENTS' => 1,
 	/**
 	 * Configuration for: SDP SmsNotificationManager configurations
 	 */
@@ -160,17 +164,22 @@ return array(
 	/**
 	 * Configuration for: Service Configurations - This should be sychroznized with the database parameters
 	 */
+	 //bulk service
 	'SERVICE_STATUS_6013202000002998' => 1,
 	'SERVICE_CODE_6013202000002998' => '901',
-	'SERVICE_DELIVERY_ENDPOINT_6013202000002998' => 'http://197.254.6.138/xtracash/test/notify.php',
-	'SERVICE_STATUS_6013992000001491' => 1,
-	'SERVICE_CODE_6013992000001491' => '29000',
-	'SERVICE_DELIVERY_ENDPOINT_6013992000001491' => 'http://192.168.0.16/pardus/delivery/receipt/',
-	'SERVICE_STATUS_6013992000001492' => 1,
-	'SERVICE_CODE_6013992000001492' => '29111',
-	'SERVICE_DELIVERY_ENDPOINT_6013992000001492' => 'http://192.168.0.16/pardus/delivery/receipt/',
-	'SERVICE_STATUS_6013992000001493' => 1,
-	'SERVICE_CODE_6013992000001493' => '29222',
-	'SERVICE_DELIVERY_ENDPOINT_6013992000001492' => 'http://192.168.0.16/pardus/delivery/receipt/',
-	
+	'SERVICE_DELIVERY_ENDPOINT_6013202000002998' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
+	'SERVICE_STATUS_6013202000002998' => 1,
+	//new service (this comment is not on masika's code)
+	'SERVICE_STATUS_6015512000111462' => 1,
+	'SERVICE_CODE_6015512000111462' => '901',
+	'SERVICE_DELIVERY_ENDPOINT_6015512000111462' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
+	'SERVICE_STATUS_6015512000111462' => 1,
+	//on demand service
+	'SERVICE_CODE_6013202000002997' => '901',
+	'SERVICE_DELIVERY_ENDPOINT_6013202000002997' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
+	'SERVICE_STATUS_6013202000002997' => 1,
+	//subscription service
+	'SERVICE_CODE_6013202000002995' => '901',
+	'SERVICE_DELIVERY_ENDPOINT_6013202000002995' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
+	'SERVICE_STATUS_6013202000002995' => 1,
 );

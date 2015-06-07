@@ -1,0 +1,80 @@
+<log4php:configuration xmlns:log4php="http://logging.apache.org/log4php/">
+    <appender name="delivery" class="LoggerAppenderDailyFile">
+		<layout class="LoggerLayoutPattern">
+            <param name="conversionPattern" value="%date{Y-m-d H:i:s,u}|%level|%logger|%msg%n%exception" />
+        </layout>
+        <param name="file" value="../logs/delivery_receipt_service_%s.log"/>
+        <param name="datePattern" value="Ymd" />
+    </appender>
+	<appender name="notify" class="LoggerAppenderDailyFile">
+		<layout class="LoggerLayoutPattern">
+            <param name="conversionPattern" value="%date{Y-m-d H:i:s,u}|%level|%logger|%msg%n%exception" />
+        </layout>
+        <param name="file" value="../logs/notify_sms_service_%s.log"/>
+        <param name="datePattern" value="Ymd" />
+    </appender>
+	<appender name="send" class="LoggerAppenderDailyFile">
+		<layout class="LoggerLayoutPattern">
+            <param name="conversionPattern" value="%date{Y-m-d H:i:s,u}|%level|%logger|%msg%n%exception" />
+        </layout>
+        <param name="file" value="../logs/sender_service_%s.log"/>
+        <param name="datePattern" value="Ymd" />
+    </appender>
+	<appender name="service" class="LoggerAppenderDailyFile">
+		<layout class="LoggerLayoutPattern">
+            <param name="conversionPattern" value="%date{Y-m-d H:i:s,u}|%level|%logger|%msg%n%exception" />
+        </layout>
+        <param name="file" value="../logs/manage_service_%s.log"/>
+        <param name="datePattern" value="Ymd" />
+    </appender>
+	<appender name="subscription" class="LoggerAppenderDailyFile">
+		<layout class="LoggerLayoutPattern">
+            <param name="conversionPattern" value="%date{Y-m-d H:i:s,u}|%level|%logger|%msg%n%exception" />
+        </layout>
+        <param name="file" value="../logs/subscription_service_%s.log"/>
+        <param name="datePattern" value="Ymd" />
+    </appender>
+	<appender name="test" class="LoggerAppenderDailyFile">
+		<layout class="LoggerLayoutPattern">
+            <param name="conversionPattern" value="%date{Y-m-d H:i:s,u}|%level|%logger|%msg%n%exception" />
+        </layout>
+        <param name="file" value="../logs/test_service_%s.log"/>
+        <param name="datePattern" value="Ymd" />
+    </appender>
+	<appender name="default" class="LoggerAppenderDailyFile">
+		<layout class="LoggerLayoutPattern">
+            <param name="conversionPattern" value="%date{Y-m-d H:i:s,u}|%level|%logger|%msg%n%exception" />
+        </layout>
+        <param name="file" value="../logs/main_%s.log"/>
+        <param name="datePattern" value="Ymd" />
+    </appender>
+	
+    <logger name="delivery">
+        <level value="debug" />
+        <appender_ref ref="delivery" />
+    </logger>
+    <logger name="notify">
+		<level value="debug" />
+        <appender_ref ref="notify" />
+    </logger>
+	<logger name="send">
+		<level value="debug" />
+        <appender_ref ref="send" />
+    </logger>
+	<logger name="service">
+		<level value="debug" />
+        <appender_ref ref="service" />
+    </logger>
+	<logger name="subscription">
+		<level value="debug" />
+        <appender_ref ref="subscription" />
+    </logger>
+	<logger name="test">
+		<level value="debug" />
+        <appender_ref ref="test" />
+    </logger>
+	<logger name="default">
+		<level value="debug" />
+        <appender_ref ref="default" />
+    </logger>
+</log4php:configuration>

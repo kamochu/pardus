@@ -1,0 +1,76 @@
+2015-06-07T02:16:08+02:00|DEBUG|subscription|Ssg\Controller\SubscriptionController|request|raw-request-data|<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loc="http://www.csapi.org/schema/parlayx/data/sync/v1_0/local">
+	<soapenv:Header/>
+	<soapenv:Body>
+		<loc:syncOrderRelation>
+			<loc:userID>
+				<ID>254721214848</ID>
+				<type>0</type>
+			</loc:userID>
+			<loc:spID>601399</loc:spID>
+			<loc:productID>MDSP2000052892</loc:productID>
+			<loc:serviceID>6013992000001442</loc:serviceID>
+			<loc:serviceList>601399200000144</loc:serviceList>
+			<loc:updateType>1</loc:updateType>
+			<loc:updateTime>20120621232135</loc:updateTime>
+			<loc:updateDesc>Addition</loc:updateDesc>
+			<loc:effectiveTime>20120622001311</loc:effectiveTime>
+			<loc:expiryTime>20120822001311</loc:expiryTime>
+			<loc:extensionInfo>
+				<namedParameters>
+					<key>TransactionID</key>
+					<value>1339730498361</value>
+					<key>orderKey</key>
+					<value>999000000009508556</value>
+					<key>MDSPSUBEXPMODE</key>
+					<value>1</value>
+					<key>objectType</key>
+					<value>1</value>
+					<key>TraceUniqueID</key>
+					<value>06212031580010010012</value>
+					<key>rentSuccess</key>
+					<value></value>
+				</namedParameters>
+			</loc:extensionInfo>
+		</loc:syncOrderRelation>
+	</soapenv:Body>
+</soapenv:Envelope>
+2015-06-07T02:16:08+02:00|DEBUG|subscription|Ssg\Model\SubscriptionModel|decode|parse-xml|parameters_extracted:{"ID":"254721214848","spID":"601399","productID":"MDSP2000052892","serviceID":"6013992000001442","serviceList":"601399200000144","updateType":"1","updateTime":"20120621232135","updateDesc":"Addition","effectiveTime":"20120622001311","expiryTime":"20120822001311","key":"TransactionID","value":"1339730498361","key1":"orderKey","value1":"999000000009508556","key2":"MDSPSUBEXPMODE","value2":"1","key3":"objectType","value3":"1","key4":"TraceUniqueID","value4":"06212031580010010012","key5":"rentSuccess","value5":""}|repeated_parameters:{"key":5,"value":5}
+2015-06-07T02:16:09+02:00|INFO|subscription|Ssg\Controller\SubscriptionController|request|process-sms-result|0|Processing successful|{"ID":"254721214848","spID":"601399","productID":"MDSP2000052892","serviceID":"6013992000001442","serviceList":"601399200000144","updateType":"1","updateTime":"20120621232135","updateDesc":"Addition","effectiveTime":"20120622001311","expiryTime":"20120822001311","key":"TransactionID","value":"1339730498361","key1":"orderKey","value1":"999000000009508556","key2":"MDSPSUBEXPMODE","value2":"1","key3":"objectType","value3":"1","key4":"TraceUniqueID","value4":"06212031580010010012","key5":"rentSuccess","value5":"","repeatedParameters":{"key":5,"value":5},"_lastInsertID":"19"}
+2015-06-07T02:17:24+02:00|DEBUG|subscription|Ssg\Controller\SubscriptionController|request|raw-request-data|<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loc="http://www.csapi.org/schema/parlayx/data/sync/v1_0/local">
+	<soapenv:Header/>
+	<soapenv:Body>
+		<loc:syncOrderRelation>
+			<loc:userID>
+				<ID>254721214848</ID>
+				<type>0</type>
+			</loc:userID>
+			<loc:spID>601399</loc:spID>
+			<loc:productID>MDSP2000052892</loc:productID>
+			<loc:serviceID>6013992000001442</loc:serviceID>
+			<loc:serviceList>601399200000144</loc:serviceList>
+			<loc:updateType>1</loc:updateType>
+			<loc:updateTime>20120621232135</loc:updateTime>
+			<loc:updateDesc>Addition</loc:updateDesc>
+			<loc:effectiveTime>20120622001311</loc:effectiveTime>
+			<loc:expiryTime>20120822001311</loc:expiryTime>
+			<loc:extensionInfo>
+				<namedParameters>
+					<key>TransactionID</key>
+					<value>1339730498361</value>
+					<key>orderKey</key>
+					<value>999000000009508556</value>
+					<key>MDSPSUBEXPMODE</key>
+					<value>1</value>
+					<key>objectType</key>
+					<value>1</value>
+					<key>TraceUniqueID</key>
+					<value>06212031580010010012</value>
+					<key>rentSuccess</key>
+					<value></value>
+				</namedParameters>
+			</loc:extensionInfo>
+		</loc:syncOrderRelation>
+	</soapenv:Body>
+</soapenv:Envelope>
+2015-06-07T02:17:24+02:00|DEBUG|subscription|Ssg\Model\SubscriptionModel|decode|parse-xml|parameters_extracted:{"ID":"254721214848","spID":"601399","productID":"MDSP2000052892","serviceID":"6013992000001442","serviceList":"601399200000144","updateType":"1","updateTime":"20120621232135","updateDesc":"Addition","effectiveTime":"20120622001311","expiryTime":"20120822001311","key":"TransactionID","value":"1339730498361","key1":"orderKey","value1":"999000000009508556","key2":"MDSPSUBEXPMODE","value2":"1","key3":"objectType","value3":"1","key4":"TraceUniqueID","value4":"06212031580010010012","key5":"rentSuccess","value5":""}|repeated_parameters:{"key":5,"value":5}
+2015-06-07T02:17:24+02:00|INFO|subscription|Ssg\Controller\SubscriptionController|request|process-sms-result|0|Processing successful|{"ID":"254721214848","spID":"601399","productID":"MDSP2000052892","serviceID":"6013992000001442","serviceList":"601399200000144","updateType":"1","updateTime":"20120621232135","updateDesc":"Addition","effectiveTime":"20120622001311","expiryTime":"20120822001311","key":"TransactionID","value":"1339730498361","key1":"orderKey","value1":"999000000009508556","key2":"MDSPSUBEXPMODE","value2":"1","key3":"objectType","value3":"1","key4":"TraceUniqueID","value4":"06212031580010010012","key5":"rentSuccess","value5":"","repeatedParameters":{"key":5,"value":5},"_lastInsertID":"20"}

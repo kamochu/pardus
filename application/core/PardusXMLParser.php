@@ -1,4 +1,5 @@
 <?php
+namespace Ssg\Core;
 /**
  * Class PardusXMLParser
  * This is a Utility class that is used to parse XML. The data in the XML is populated in an associated array ($parameters) 
@@ -56,7 +57,25 @@ class PardusXMLParser
 	public function getRepeatedParametersArray()
 	{
 		return $this->repeatedParameters;
-	}	
+	}
+	
+	/**
+	* This is a getter method gets XML parser error string
+	* @return string  XML parser error string
+	*/
+	public function getParseError()
+	{
+		return xml_error_string(xml_get_error_code($this->parser));
+	}
+	
+	/**
+	* This is a getter method that gets the line number  where the parsing error was encountered. 
+	* @return int line number
+	*/
+	public function getCurrentLineNumber()
+	{		
+		return xml_get_current_line_number($this->parser);
+	}
 	
 	
 	/**
@@ -101,31 +120,32 @@ class PardusXMLParser
 	*/
     public function endElement($parser, $name)
     {
-        //if they are equal
-		if(strcmp($this->currentParam, $name) == 0 && !empty($this->currentValue))
-		{
-			/* Sometimes parameter might include the namespace e.g.  'loc:serviceID'. The logic below strips off namespace part.*/
+        //if they are equal, had to delete '&& !empty($this->currentValue)' to ensure that all parameters are addded
+		if(strcmp($this->currentParam, $name) == 0 ) {
+			/* Sometimes parameter might include the XML namespace e.g.  'loc:serviceID'. The logic below strips off namespace part.*/
 			$position = strpos($this->currentParam, ":");
 			$param_name = $this->currentParam;
-			if( $position !== false) // no namespace character
-			{
+			if ( $position !== false) { // no namespace character
 				$param_name = substr($this->currentParam,$position+1); // ignore the ":" - substring from next character after 
 			}
 			
 			//check whether there is a parameter with the same name
-			if(isset($this->parameters[$param_name])){
+			if (isset($this->parameters[$param_name])) {
 				$repeated_suffix =1; // default parameter
 				//check whether there is a record in the repeated parameters
-				if(isset($this->repeatedParameters[$param_name]))
-				{
+				if (isset($this->repeatedParameters[$param_name])) {
 					$repeated_suffix = $this->repeatedParameters[$param_name]+1; //assign it to the suffix
 				}
 				
 				$this->repeatedParameters[$param_name] = $repeated_suffix; // update the repated parameter counter for that value
 				$param_name = $param_name.$repeated_suffix; // append the repeated suffix to the parameter
+				$this->parameters[$param_name] = $this->currentValue;
+			} else {
+				
+				if(isset($this->currentValue) && !empty($this->currentValue)) {
+					$this->parameters[$param_name] = $this->currentValue;
+				}		
 			}
-			
-			$this->parameters[$param_name] = $this->currentValue;
 		}
     }
 

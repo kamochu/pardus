@@ -1,21 +1,36 @@
 <?php
+namespace Ssg\Controller;
+
+use Ssg\Core\Controller;
+use Ssg\Model\SendModel;
+use Ssg\Core\Request;
+use Psr\Log\LoggerInterface;
 
 class SendController extends Controller
 {
     /**
      * Construct this object by extending the basic Controller class
      */
-    public function __construct()
+    public function __construct(LoggerInterface $logger = null)
     {
-        parent::__construct();
+        parent::__construct($logger);
     }
+	
 	
     /**
      * Handles what happens when user moves to URL/notify
      */
     public function index()
     {
-		//initialize data 
+		$this->sms();
+    }
+	
+	/**
+     * Handles what happens when user moves to URL/notify/sms
+     */
+	 public function sms()
+	 {
+		 //initialize data 
 		$data = array();
 		$data['service_id'] = '';
 		$data['link_id'] = '';
@@ -35,8 +50,31 @@ class SendController extends Controller
 		$data['correlator'] = Request::get('correlator',true);
 		$data['message'] = Request::get('message',true);
 		
+		$this->logger->debug(
+			'{class_mame}|{method_name}|send-sms-request|{parameters}',
+			array(
+				'class_mame'=>__CLASS__,
+				'method_name'=>__FUNCTION__,
+				'parameters'=>implode('|',$data)
+			)
+		);
+		
 		//call the sender model to process
-		$resultData = SendModel::process($data);
+		$model = new SendModel($this->logger);
+		$resultData = $model->process($data);
+		$this->logger->info(
+			'{class_mame}|{method_name}|send-sms-result|{parameters}|{result}|{result_desc}|{send_ref_id}|{send_status}|{send_status_desc}',
+			array(
+				'class_mame'=>__CLASS__,
+				'method_name'=>__FUNCTION__,
+				'parameters'=>implode('|',$data),
+				'result'=>$resultData['result'],
+				'result_desc'=>$resultData['resultDesc'],
+				'send_ref_id'=>$resultData['data']['send_ref_id'],
+				'send_status'=>$resultData['data']['status'],
+				'send_status_desc'=>$resultData['data']['status_desc']
+			)
+		);
 		
 		if($resultData['result'] == 0)  // successful processing
 		{
@@ -55,15 +93,6 @@ class SendController extends Controller
 			header('HTTP/1.0 500 Internal Server Error');
 		 	$this->View->renderWithoutHeaderAndFooter('error/httperror500',array("error"=>$resultData['result']." - ".$resultData['resultDesc']));
 		}
-		
-    }
-	
-	/**
-     * Handles what happens when user moves to URL/notify/sms
-     */
-	 public function sms()
-	 {
-		 $this->index();
 	 }
 	
 }

@@ -1,4 +1,5 @@
 <?php
+namespace Ssg\Core;
 
 /**
  * Session class

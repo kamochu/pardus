@@ -1,3 +1,7 @@
+<?php
+use \Ssg\Core\Config;
+
+?>
 <!doctype html>
 <html>
 <head>

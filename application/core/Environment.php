@@ -1,4 +1,5 @@
 <?php
+namespace Ssg\Core;
 
 /**
  * Class Environment
