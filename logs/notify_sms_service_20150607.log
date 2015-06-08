@@ -2095,3 +2095,303 @@
 2015-06-07 04:01:49,011|INFO|notify|Ssg\Controller\NotifyController|sms|process-sms-result|0|Processing successful|{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00","_lastInsertID":"155"}
 2015-06-07 04:01:49,511|INFO|notify|Ssg\Controller\NotifyController|sms|process-sms-result|0|Processing successful|{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00","_lastInsertID":"156"}
 2015-06-07 04:01:50,032|INFO|notify|Ssg\Controller\NotifyController|sms|process-sms-result|0|Processing successful|{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00","_lastInsertID":"157"}
+2015-06-07 15:40:05,299|DEBUG|notify|Ssg\Controller\NotifyController|sms|raw-request-data|<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://www.huawei.com.cn/schema/common/v2_1" xmlns:loc="http://www.csapi.org/schema/parlayx/sms/notification/v2_2/local">
+   <soapenv:Header>
+      <ns1:NotifySOAPHeader xmlns:ns1="http://www.huawei.com.cn/schema/common/v2_1">
+         <ns1:spRevId>ekubai</ns1:spRevId>
+         <ns1:spRevpassword>Abc123</ns1:spRevpassword>
+         <ns1:spId>601399</ns1:spId>
+         <ns1:serviceId>6013992000001491</ns1:serviceId>
+         <ns1:linkid>07161722430758000009</ns1:linkid>
+         <ns1:traceUniqueID>404090102591207161422430892004</ns1:traceUniqueID>
+      </ns1:NotifySOAPHeader>
+   </soapenv:Header>
+   <soapenv:Body>
+      <loc:notifySmsReception>
+         <loc:correlator>123</loc:correlator>
+         <loc:message>
+            <message>This is a test message</message>
+            <senderAddress>tel:722123456</senderAddress>
+            <smsServiceActivationNumber>1234</smsServiceActivationNumber>
+            <dateTime>2012-07-03T00:00:00.000+08:00</dateTime>
+         </loc:message>
+      </loc:notifySmsReception>
+   </soapenv:Body>
+</soapenv:Envelope>
+2015-06-07 15:40:07,842|DEBUG|notify|Ssg\Model\NotifyModel|decode|parse-xml|parameters_extracted:{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00"}|repeated_parameters:[]
+2015-06-07 15:40:10,557|INFO|notify|Ssg\Controller\NotifyController|sms|process-sms-result|0|Processing successful|{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00","_lastInsertID":"158"}
+2015-06-07 15:40:19,789|DEBUG|notify|Ssg\Controller\NotifyController|sms|raw-request-data|<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://www.huawei.com.cn/schema/common/v2_1" xmlns:loc="http://www.csapi.org/schema/parlayx/sms/notification/v2_2/local">
+   <soapenv:Header>
+      <ns1:NotifySOAPHeader xmlns:ns1="http://www.huawei.com.cn/schema/common/v2_1">
+         <ns1:spRevId>ekubai</ns1:spRevId>
+         <ns1:spRevpassword>Abc123</ns1:spRevpassword>
+         <ns1:spId>601399</ns1:spId>
+         <ns1:serviceId>6013992000001491</ns1:serviceId>
+         <ns1:linkid>07161722430758000009</ns1:linkid>
+         <ns1:traceUniqueID>404090102591207161422430892004</ns1:traceUniqueID>
+      </ns1:NotifySOAPHeader>
+   </soapenv:Header>
+   <soapenv:Body>
+      <loc:notifySmsReception>
+         <loc:correlator>123</loc:correlator>
+         <loc:message>
+            <message>This is a test message</message>
+            <senderAddress>tel:722123456</senderAddress>
+            <smsServiceActivationNumber>1234</smsServiceActivationNumber>
+            <dateTime>2012-07-03T00:00:00.000+08:00</dateTime>
+         </loc:message>
+      </loc:notifySmsReception>
+   </soapenv:Body>
+</soapenv:Envelope>
+2015-06-07 15:40:19,797|DEBUG|notify|Ssg\Model\NotifyModel|decode|parse-xml|parameters_extracted:{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00"}|repeated_parameters:[]
+2015-06-07 15:40:19,988|INFO|notify|Ssg\Controller\NotifyController|sms|process-sms-result|0|Processing successful|{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00","_lastInsertID":"159"}
+2015-06-07 15:40:23,159|DEBUG|notify|Ssg\Controller\NotifyController|sms|raw-request-data|<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://www.huawei.com.cn/schema/common/v2_1" xmlns:loc="http://www.csapi.org/schema/parlayx/sms/notification/v2_2/local">
+   <soapenv:Header>
+      <ns1:NotifySOAPHeader xmlns:ns1="http://www.huawei.com.cn/schema/common/v2_1">
+         <ns1:spRevId>ekubai</ns1:spRevId>
+         <ns1:spRevpassword>Abc123</ns1:spRevpassword>
+         <ns1:spId>601399</ns1:spId>
+         <ns1:serviceId>6013992000001491</ns1:serviceId>
+         <ns1:linkid>07161722430758000009</ns1:linkid>
+         <ns1:traceUniqueID>404090102591207161422430892004</ns1:traceUniqueID>
+      </ns1:NotifySOAPHeader>
+   </soapenv:Header>
+   <soapenv:Body>
+      <loc:notifySmsReception>
+         <loc:correlator>123</loc:correlator>
+         <loc:message>
+            <message>This is a test message</message>
+            <senderAddress>tel:722123456</senderAddress>
+            <smsServiceActivationNumber>1234</smsServiceActivationNumber>
+            <dateTime>2012-07-03T00:00:00.000+08:00</dateTime>
+         </loc:message>
+      </loc:notifySmsReception>
+   </soapenv:Body>
+</soapenv:Envelope>
+2015-06-07 15:40:23,169|DEBUG|notify|Ssg\Model\NotifyModel|decode|parse-xml|parameters_extracted:{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00"}|repeated_parameters:[]
+2015-06-07 15:40:23,296|INFO|notify|Ssg\Controller\NotifyController|sms|process-sms-result|0|Processing successful|{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00","_lastInsertID":"160"}
+2015-06-07 15:40:24,092|DEBUG|notify|Ssg\Controller\NotifyController|sms|raw-request-data|<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://www.huawei.com.cn/schema/common/v2_1" xmlns:loc="http://www.csapi.org/schema/parlayx/sms/notification/v2_2/local">
+   <soapenv:Header>
+      <ns1:NotifySOAPHeader xmlns:ns1="http://www.huawei.com.cn/schema/common/v2_1">
+         <ns1:spRevId>ekubai</ns1:spRevId>
+         <ns1:spRevpassword>Abc123</ns1:spRevpassword>
+         <ns1:spId>601399</ns1:spId>
+         <ns1:serviceId>6013992000001491</ns1:serviceId>
+         <ns1:linkid>07161722430758000009</ns1:linkid>
+         <ns1:traceUniqueID>404090102591207161422430892004</ns1:traceUniqueID>
+      </ns1:NotifySOAPHeader>
+   </soapenv:Header>
+   <soapenv:Body>
+      <loc:notifySmsReception>
+         <loc:correlator>123</loc:correlator>
+         <loc:message>
+            <message>This is a test message</message>
+            <senderAddress>tel:722123456</senderAddress>
+            <smsServiceActivationNumber>1234</smsServiceActivationNumber>
+            <dateTime>2012-07-03T00:00:00.000+08:00</dateTime>
+         </loc:message>
+      </loc:notifySmsReception>
+   </soapenv:Body>
+</soapenv:Envelope>
+2015-06-07 15:40:24,101|DEBUG|notify|Ssg\Model\NotifyModel|decode|parse-xml|parameters_extracted:{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00"}|repeated_parameters:[]
+2015-06-07 15:40:24,202|INFO|notify|Ssg\Controller\NotifyController|sms|process-sms-result|0|Processing successful|{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00","_lastInsertID":"161"}
+2015-06-07 15:40:25,053|DEBUG|notify|Ssg\Controller\NotifyController|sms|raw-request-data|<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://www.huawei.com.cn/schema/common/v2_1" xmlns:loc="http://www.csapi.org/schema/parlayx/sms/notification/v2_2/local">
+   <soapenv:Header>
+      <ns1:NotifySOAPHeader xmlns:ns1="http://www.huawei.com.cn/schema/common/v2_1">
+         <ns1:spRevId>ekubai</ns1:spRevId>
+         <ns1:spRevpassword>Abc123</ns1:spRevpassword>
+         <ns1:spId>601399</ns1:spId>
+         <ns1:serviceId>6013992000001491</ns1:serviceId>
+         <ns1:linkid>07161722430758000009</ns1:linkid>
+         <ns1:traceUniqueID>404090102591207161422430892004</ns1:traceUniqueID>
+      </ns1:NotifySOAPHeader>
+   </soapenv:Header>
+   <soapenv:Body>
+      <loc:notifySmsReception>
+         <loc:correlator>123</loc:correlator>
+         <loc:message>
+            <message>This is a test message</message>
+            <senderAddress>tel:722123456</senderAddress>
+            <smsServiceActivationNumber>1234</smsServiceActivationNumber>
+            <dateTime>2012-07-03T00:00:00.000+08:00</dateTime>
+         </loc:message>
+      </loc:notifySmsReception>
+   </soapenv:Body>
+</soapenv:Envelope>
+2015-06-07 15:40:25,059|DEBUG|notify|Ssg\Model\NotifyModel|decode|parse-xml|parameters_extracted:{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00"}|repeated_parameters:[]
+2015-06-07 15:40:25,212|INFO|notify|Ssg\Controller\NotifyController|sms|process-sms-result|0|Processing successful|{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00","_lastInsertID":"162"}
+2015-06-07 15:40:25,513|DEBUG|notify|Ssg\Controller\NotifyController|sms|raw-request-data|<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://www.huawei.com.cn/schema/common/v2_1" xmlns:loc="http://www.csapi.org/schema/parlayx/sms/notification/v2_2/local">
+   <soapenv:Header>
+      <ns1:NotifySOAPHeader xmlns:ns1="http://www.huawei.com.cn/schema/common/v2_1">
+         <ns1:spRevId>ekubai</ns1:spRevId>
+         <ns1:spRevpassword>Abc123</ns1:spRevpassword>
+         <ns1:spId>601399</ns1:spId>
+         <ns1:serviceId>6013992000001491</ns1:serviceId>
+         <ns1:linkid>07161722430758000009</ns1:linkid>
+         <ns1:traceUniqueID>404090102591207161422430892004</ns1:traceUniqueID>
+      </ns1:NotifySOAPHeader>
+   </soapenv:Header>
+   <soapenv:Body>
+      <loc:notifySmsReception>
+         <loc:correlator>123</loc:correlator>
+         <loc:message>
+            <message>This is a test message</message>
+            <senderAddress>tel:722123456</senderAddress>
+            <smsServiceActivationNumber>1234</smsServiceActivationNumber>
+            <dateTime>2012-07-03T00:00:00.000+08:00</dateTime>
+         </loc:message>
+      </loc:notifySmsReception>
+   </soapenv:Body>
+</soapenv:Envelope>
+2015-06-07 15:40:25,518|DEBUG|notify|Ssg\Model\NotifyModel|decode|parse-xml|parameters_extracted:{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00"}|repeated_parameters:[]
+2015-06-07 15:40:25,593|INFO|notify|Ssg\Controller\NotifyController|sms|process-sms-result|0|Processing successful|{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00","_lastInsertID":"163"}
+2015-06-07 15:40:26,269|DEBUG|notify|Ssg\Controller\NotifyController|sms|raw-request-data|<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://www.huawei.com.cn/schema/common/v2_1" xmlns:loc="http://www.csapi.org/schema/parlayx/sms/notification/v2_2/local">
+   <soapenv:Header>
+      <ns1:NotifySOAPHeader xmlns:ns1="http://www.huawei.com.cn/schema/common/v2_1">
+         <ns1:spRevId>ekubai</ns1:spRevId>
+         <ns1:spRevpassword>Abc123</ns1:spRevpassword>
+         <ns1:spId>601399</ns1:spId>
+         <ns1:serviceId>6013992000001491</ns1:serviceId>
+         <ns1:linkid>07161722430758000009</ns1:linkid>
+         <ns1:traceUniqueID>404090102591207161422430892004</ns1:traceUniqueID>
+      </ns1:NotifySOAPHeader>
+   </soapenv:Header>
+   <soapenv:Body>
+      <loc:notifySmsReception>
+         <loc:correlator>123</loc:correlator>
+         <loc:message>
+            <message>This is a test message</message>
+            <senderAddress>tel:722123456</senderAddress>
+            <smsServiceActivationNumber>1234</smsServiceActivationNumber>
+            <dateTime>2012-07-03T00:00:00.000+08:00</dateTime>
+         </loc:message>
+      </loc:notifySmsReception>
+   </soapenv:Body>
+</soapenv:Envelope>
+2015-06-07 15:40:26,279|DEBUG|notify|Ssg\Model\NotifyModel|decode|parse-xml|parameters_extracted:{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00"}|repeated_parameters:[]
+2015-06-07 15:40:26,349|INFO|notify|Ssg\Controller\NotifyController|sms|process-sms-result|0|Processing successful|{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00","_lastInsertID":"164"}
+2015-06-07 15:40:26,999|DEBUG|notify|Ssg\Controller\NotifyController|sms|raw-request-data|<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://www.huawei.com.cn/schema/common/v2_1" xmlns:loc="http://www.csapi.org/schema/parlayx/sms/notification/v2_2/local">
+   <soapenv:Header>
+      <ns1:NotifySOAPHeader xmlns:ns1="http://www.huawei.com.cn/schema/common/v2_1">
+         <ns1:spRevId>ekubai</ns1:spRevId>
+         <ns1:spRevpassword>Abc123</ns1:spRevpassword>
+         <ns1:spId>601399</ns1:spId>
+         <ns1:serviceId>6013992000001491</ns1:serviceId>
+         <ns1:linkid>07161722430758000009</ns1:linkid>
+         <ns1:traceUniqueID>404090102591207161422430892004</ns1:traceUniqueID>
+      </ns1:NotifySOAPHeader>
+   </soapenv:Header>
+   <soapenv:Body>
+      <loc:notifySmsReception>
+         <loc:correlator>123</loc:correlator>
+         <loc:message>
+            <message>This is a test message</message>
+            <senderAddress>tel:722123456</senderAddress>
+            <smsServiceActivationNumber>1234</smsServiceActivationNumber>
+            <dateTime>2012-07-03T00:00:00.000+08:00</dateTime>
+         </loc:message>
+      </loc:notifySmsReception>
+   </soapenv:Body>
+</soapenv:Envelope>
+2015-06-07 15:40:27,009|DEBUG|notify|Ssg\Model\NotifyModel|decode|parse-xml|parameters_extracted:{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00"}|repeated_parameters:[]
+2015-06-07 15:40:27,429|INFO|notify|Ssg\Controller\NotifyController|sms|process-sms-result|0|Processing successful|{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00","_lastInsertID":"165"}
+2015-06-07 15:40:28,099|DEBUG|notify|Ssg\Controller\NotifyController|sms|raw-request-data|<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://www.huawei.com.cn/schema/common/v2_1" xmlns:loc="http://www.csapi.org/schema/parlayx/sms/notification/v2_2/local">
+   <soapenv:Header>
+      <ns1:NotifySOAPHeader xmlns:ns1="http://www.huawei.com.cn/schema/common/v2_1">
+         <ns1:spRevId>ekubai</ns1:spRevId>
+         <ns1:spRevpassword>Abc123</ns1:spRevpassword>
+         <ns1:spId>601399</ns1:spId>
+         <ns1:serviceId>6013992000001491</ns1:serviceId>
+         <ns1:linkid>07161722430758000009</ns1:linkid>
+         <ns1:traceUniqueID>404090102591207161422430892004</ns1:traceUniqueID>
+      </ns1:NotifySOAPHeader>
+   </soapenv:Header>
+   <soapenv:Body>
+      <loc:notifySmsReception>
+         <loc:correlator>123</loc:correlator>
+         <loc:message>
+            <message>This is a test message</message>
+            <senderAddress>tel:722123456</senderAddress>
+            <smsServiceActivationNumber>1234</smsServiceActivationNumber>
+            <dateTime>2012-07-03T00:00:00.000+08:00</dateTime>
+         </loc:message>
+      </loc:notifySmsReception>
+   </soapenv:Body>
+</soapenv:Envelope>
+2015-06-07 15:40:28,099|DEBUG|notify|Ssg\Model\NotifyModel|decode|parse-xml|parameters_extracted:{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00"}|repeated_parameters:[]
+2015-06-07 15:40:28,259|INFO|notify|Ssg\Controller\NotifyController|sms|process-sms-result|0|Processing successful|{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00","_lastInsertID":"166"}
+2015-06-07 15:40:28,759|DEBUG|notify|Ssg\Controller\NotifyController|sms|raw-request-data|<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://www.huawei.com.cn/schema/common/v2_1" xmlns:loc="http://www.csapi.org/schema/parlayx/sms/notification/v2_2/local">
+   <soapenv:Header>
+      <ns1:NotifySOAPHeader xmlns:ns1="http://www.huawei.com.cn/schema/common/v2_1">
+         <ns1:spRevId>ekubai</ns1:spRevId>
+         <ns1:spRevpassword>Abc123</ns1:spRevpassword>
+         <ns1:spId>601399</ns1:spId>
+         <ns1:serviceId>6013992000001491</ns1:serviceId>
+         <ns1:linkid>07161722430758000009</ns1:linkid>
+         <ns1:traceUniqueID>404090102591207161422430892004</ns1:traceUniqueID>
+      </ns1:NotifySOAPHeader>
+   </soapenv:Header>
+   <soapenv:Body>
+      <loc:notifySmsReception>
+         <loc:correlator>123</loc:correlator>
+         <loc:message>
+            <message>This is a test message</message>
+            <senderAddress>tel:722123456</senderAddress>
+            <smsServiceActivationNumber>1234</smsServiceActivationNumber>
+            <dateTime>2012-07-03T00:00:00.000+08:00</dateTime>
+         </loc:message>
+      </loc:notifySmsReception>
+   </soapenv:Body>
+</soapenv:Envelope>
+2015-06-07 15:40:28,759|DEBUG|notify|Ssg\Model\NotifyModel|decode|parse-xml|parameters_extracted:{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00"}|repeated_parameters:[]
+2015-06-07 15:40:28,959|INFO|notify|Ssg\Controller\NotifyController|sms|process-sms-result|0|Processing successful|{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00","_lastInsertID":"167"}
+2015-06-07 15:40:30,004|DEBUG|notify|Ssg\Controller\NotifyController|sms|raw-request-data|<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://www.huawei.com.cn/schema/common/v2_1" xmlns:loc="http://www.csapi.org/schema/parlayx/sms/notification/v2_2/local">
+   <soapenv:Header>
+      <ns1:NotifySOAPHeader xmlns:ns1="http://www.huawei.com.cn/schema/common/v2_1">
+         <ns1:spRevId>ekubai</ns1:spRevId>
+         <ns1:spRevpassword>Abc123</ns1:spRevpassword>
+         <ns1:spId>601399</ns1:spId>
+         <ns1:serviceId>6013992000001491</ns1:serviceId>
+         <ns1:linkid>07161722430758000009</ns1:linkid>
+         <ns1:traceUniqueID>404090102591207161422430892004</ns1:traceUniqueID>
+      </ns1:NotifySOAPHeader>
+   </soapenv:Header>
+   <soapenv:Body>
+      <loc:notifySmsReception>
+         <loc:correlator>123</loc:correlator>
+         <loc:message>
+            <message>This is a test message</message>
+            <senderAddress>tel:722123456</senderAddress>
+            <smsServiceActivationNumber>1234</smsServiceActivationNumber>
+            <dateTime>2012-07-03T00:00:00.000+08:00</dateTime>
+         </loc:message>
+      </loc:notifySmsReception>
+   </soapenv:Body>
+</soapenv:Envelope>
+2015-06-07 15:40:30,014|DEBUG|notify|Ssg\Model\NotifyModel|decode|parse-xml|parameters_extracted:{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00"}|repeated_parameters:[]
+2015-06-07 15:40:30,109|INFO|notify|Ssg\Controller\NotifyController|sms|process-sms-result|0|Processing successful|{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00","_lastInsertID":"168"}
+2015-06-07 15:40:31,235|DEBUG|notify|Ssg\Controller\NotifyController|sms|raw-request-data|<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://www.huawei.com.cn/schema/common/v2_1" xmlns:loc="http://www.csapi.org/schema/parlayx/sms/notification/v2_2/local">
+   <soapenv:Header>
+      <ns1:NotifySOAPHeader xmlns:ns1="http://www.huawei.com.cn/schema/common/v2_1">
+         <ns1:spRevId>ekubai</ns1:spRevId>
+         <ns1:spRevpassword>Abc123</ns1:spRevpassword>
+         <ns1:spId>601399</ns1:spId>
+         <ns1:serviceId>6013992000001491</ns1:serviceId>
+         <ns1:linkid>07161722430758000009</ns1:linkid>
+         <ns1:traceUniqueID>404090102591207161422430892004</ns1:traceUniqueID>
+      </ns1:NotifySOAPHeader>
+   </soapenv:Header>
+   <soapenv:Body>
+      <loc:notifySmsReception>
+         <loc:correlator>123</loc:correlator>
+         <loc:message>
+            <message>This is a test message</message>
+            <senderAddress>tel:722123456</senderAddress>
+            <smsServiceActivationNumber>1234</smsServiceActivationNumber>
+            <dateTime>2012-07-03T00:00:00.000+08:00</dateTime>
+         </loc:message>
+      </loc:notifySmsReception>
+   </soapenv:Body>
+</soapenv:Envelope>
+2015-06-07 15:40:31,240|DEBUG|notify|Ssg\Model\NotifyModel|decode|parse-xml|parameters_extracted:{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00"}|repeated_parameters:[]
+2015-06-07 15:40:31,486|INFO|notify|Ssg\Controller\NotifyController|sms|process-sms-result|0|Processing successful|{"spRevId":"ekubai","spRevpassword":"Abc123","spId":"601399","serviceId":"6013992000001491","linkid":"07161722430758000009","traceUniqueID":"404090102591207161422430892004","correlator":"123","message":"This is a test message","senderAddress":"tel:722123456","smsServiceActivationNumber":"1234","dateTime":"2012-07-03T00:00:00.000+08:00","_lastInsertID":"169"}

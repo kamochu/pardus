@@ -194,13 +194,14 @@ class SendModel extends Model
 			return  array('result' => 3, 'resultDesc' => 'Cannot connect to the database. Error: '.$ex->getMessage()); 
 		}
 		
-				//saving the data
+		//saving the data
 		try{
 			$database->beginTransaction();
 			$sql='INSERT INTO tbl_outbound_messages (service_id, link_id, linked_incoming_msg_id, dest_address, sender_address, correlator, batch_id, message, notify_endpoint, send_timestamp, send_ref_id, status, status_desc, created_on, last_updated_on) VALUES(:service_id, :link_id, :linked_incoming_msg_id, :dest_address, :sender_address, :correlator, :batch_id, :message, :notify_endpoint, NOW(), :send_ref_id, :status,  :status_desc, NOW(), NOW());';
 			$query = $database->prepare($sql);
+			$bind_parameters = array(':service_id' => $service_id , ':link_id' => $link_id, ':linked_incoming_msg_id' => $linked_incoming_msg_id, ':dest_address' => $dest_address, ':sender_address' => $sender_address, ':correlator' => $correlator, ':batch_id' => $batch_id, ':message' => $message, ':notify_endpoint' => $notify_endpoint, ':send_ref_id' => $send_ref_id, ':status' => $status, ':status_desc' => $status_desc);
 			
-			if ($query->execute(array(':service_id' => $service_id , ':link_id' => $link_id, ':linked_incoming_msg_id' => $linked_incoming_msg_id, ':dest_address' => $dest_address, ':sender_address' => $sender_address, ':correlator' => $correlator, ':batch_id' => $batch_id, ':message' => $message, ':notify_endpoint' => $notify_endpoint, ':send_ref_id' => $send_ref_id, ':status' => $status, ':status_desc' => $status_desc))) {
+			if ($query->execute($bind_parameters)) {
 				//add last insert id, may be used in the next method calls
 				$data['_lastInsertID'] = $database->lastInsertId();
 				
@@ -219,7 +220,7 @@ class SendModel extends Model
 						'method_name'=>__FUNCTION__,
 						'service_id'=>$service_id,
 						'query'=>$sql,
-						'bind_params'=>implode(',',array(':service_id' => $service_id , ':link_id' => $link_id, ':linked_incoming_msg_id' => $linked_incoming_msg_id, ':dest_address' => $dest_address, ':sender_address' => $sender_address, ':correlator' => $correlator, ':batch_id' => $batch_id, ':message' => $message, ':notify_endpoint' => $notify_endpoint, ':send_ref_id' => $send_ref_id, ':status' => $status, ':status_desc' => $status_desc))
+						'bind_params'=>json_encode($bind_parameters)
 					)
 				);
 				return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 

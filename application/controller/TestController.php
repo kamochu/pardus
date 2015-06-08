@@ -25,30 +25,34 @@ class TestController extends Controller
 		$service_model= new ServiceModel($this->logger);
 		print_r($service_model->getServices());
 		
-		//$response = ServiceModel::getService('6013992000001494');
-		//echo "Query sevrice\n\n\n";
-		//print_r($response);
+		$response = $service_model->getService('6013992000001494');
+		echo "\n\n\nQUERY SERVICE\n\n";
+		print_r($response);
 		
-		/*$service = $response['service'];
+		$service = $response['service'];
 		$service->short_code = '29333';
 		$service->criteria = 'Love';
 		$service->correlator = '20150417172519';
 		$service->service_name = 'Service name after update';
-		*/
+		$response = $service_model->updateService(json_decode(json_encode($service),true));
+		echo "\n\n\nUPDATE SERVICE\n\n";
+		print_r($response);
+		
+		
+		
 		//print_r($service);
 		//$response2 = ServiceModel::getAllServices();
 		//echo "All Services\n\n\n";
 		//print_r(ServiceModel::getAllServices());
 		
 		
-		//echo "\n\n\nDELETE SERVICE:\n\n";
-		//print_r(ServiceModel::deleteService('6013992000001494'));
+		echo "\n\n\nDELETE SERVICE:\n\n";
+		print_r($service_model->deleteService('6013992000001495'));
 		
 		//echo "\n\n\nADD SERVICE:\n\n";
-		//print_r(ServiceModel::addService(array('service_id' => '6013992000001494', 'service_name' => 'Test service', 'service_type'=>1, 'short_code' => '29678', 'criteria' => '', 'service_endpoint' => 'http://192.168.0.16/pardus/notify/sms/', 'delivery_notification_endpoint' => 'http://192.168.0.16/pardus/delivery/receipt/',  'interface_name' => 'notifySmsReception', 'correlator' => '34234234', 'status' => 0,'last_updated_by' => '2')));
+		//print_r($service_model->addService(array('service_id' => '6013992000001495', 'service_name' => 'Test service', 'service_type'=>1, 'short_code' => '29678', 'criteria' => '', 'service_endpoint' => 'http://192.168.0.16/pardus/notify/sms/', 'delivery_notification_endpoint' => 'http://192.168.0.16/pardus/delivery/receipt/',  'interface_name' => 'notifySmsReception', 'correlator' => '34234234', 'status' => 0,'last_updated_by' => '2')));
 		
 		$model=new MessageModel($this->logger);
-		
 		echo "\n\n\nGET INBOUND MESSAGES:\n\n"; 
 		//print_r(MessageModel:: getInboundMessages('2015-04-21 08:38:36', ''2015-04-21 08:38:39'', $subscriber_id='',  $short_code='', $service_id='', $start_index=0, $limit=10));
 		print_r($model->getInboundMessages('2015-04-21 08:38:36', '2016-04-21 08:38:37', '', '', '', 0, 2));

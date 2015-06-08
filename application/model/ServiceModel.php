@@ -8,6 +8,7 @@ use \Ssg\Core\DatabaseFactory;
 use \Psr\Log\LoggerInterface;
 use \Psr\Log\NullLogger;
 use \Exception;
+use \stdClass;
 
 /**
  * ServiceManagerModel - offers utility functions to manage service
@@ -184,7 +185,7 @@ class ServiceModel extends Model
      *
 	 * @return string correlator
      */
-	private static function generateCorrelator()
+	private function generateCorrelator()
 	{
 		return date("YmdHis"); 
 	}
@@ -198,27 +199,47 @@ class ServiceModel extends Model
      */
 	public function getService($service_id)
 	{	
+		//get the database connection
 		$database=null;
 		try {
 			$database = DatabaseFactory::getFactory()->getConnection();
 		} catch (Exception $ex) {
 			return  array('result' => 3, 'resultDesc' => 'Cannot connect to the database. Error: '.$ex->getMessage()); 
 		}
-
-        $sql = "SELECT id, service_id, service_name, service_type, short_code, service_endpoint, 
+		
+		//prepare and execute the query
+		try {		
+			$sql = "SELECT id, service_id, service_name, service_type, short_code, service_endpoint, 
 				criteria, delivery_notification_endpoint, interface_name, correlator, status
                 FROM tbl_services WHERE service_id = :service_id LIMIT 1";
-        $query = $database->prepare($sql);
-        $query->execute(array(':service_id' => $service_id));
-
-        $service = $query->fetch();
-
-        if ($query->rowCount() < 1)
-		{	
-           return array('result' => 1, 'resultDesc' => 'Service with id '.$service_id.' not found.', 'service' => new stdClass()); 
-        }
+			$query = $database->prepare($sql);
+			$bind_parameters = array(':service_id' => $service_id);
+			
+			if ($query->execute($bind_parameters)) {
+				$service = $query->fetch();
+				if ($query->rowCount() < 1) {	
+				   return array('result' => 1, 'resultDesc' => 'Service with id '.$service_id.' not found.', 'service' => new stdClass()); 
+				}else{
+					return array('result' => 0, 'resultDesc' => 'Service found.', 'service' => $service); 
+				}
+			} else {	
+				$this->logger->error(
+					'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}|bind_parameters:{bind_params}',
+					array(
+						'class_mame'=>__CLASS__,
+						'method_name'=>__FUNCTION__,
+						'error'=>$database->errorCode(),
+						'query'=>$sql,
+						'bind_params'=>json_encode($bind_parameters)
+					)
+				);
+				return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 
+			}
+		} catch (PDOException $e) {
+			return  array('result' => 4, 'resultDesc' => 'Error executing a query. Error: '.$e->getMessage()); 
+		}
 		
-        return array('result' => 0, 'resultDesc' => 'Service found.', 'service' => $service); 
+        return array('result' => 7, 'resultDesc' => 'Unknown error', 'service' => new stdClass()); 
 	}
 	
 	
@@ -327,23 +348,47 @@ class ServiceModel extends Model
 		if(isset($service_data['status'])) $status=$service_data['status'];
 		if(isset($service_data['last_updated_by'])) $last_updated_by=$service_data['last_updated_by'];
 		
-		// add some logic to handle exceptions in this script
-		$database = DatabaseFactory::getFactory()->getConnection();
-		$database->beginTransaction();
-		$sql='INSERT INTO tbl_services(service_id,service_name,service_type,short_code,criteria,service_endpoint,delivery_notification_endpoint,interface_name,correlator,status,created_on,last_updated_on,last_updated_by) 
-VALUES(:service_id,:service_name,:service_type,:short_code,:criteria,:service_endpoint,:delivery_notification_endpoint,:interface_name,:correlator,:status,NOW(),NOW(),:last_updated_by)';
-		$query = $database->prepare($sql);
+		$database=null;
+		try {
+			$database = DatabaseFactory::getFactory()->getConnection();
+		} catch (Exception $ex) {
+			return  array('result' => 3, 'resultDesc' => 'Cannot connect to the database. Error: '.$ex->getMessage()); 
+		}
 		
-		$query->execute(array(':service_id' => $service_id , ':service_name' => $service_name, ':service_type' => $service_type, ':short_code' => $short_code, ':criteria' => $criteria, ':service_endpoint' => $service_endpoint, ':delivery_notification_endpoint' => $delivery_notification_endpoint, ':interface_name' => $interface_name, ':correlator' => $correlator, ':status' => $status, ':last_updated_by' => $last_updated_by));
+		try {		
+			$database->beginTransaction();
+			$sql='INSERT INTO tbl_services (service_id, service_name, service_type, short_code, criteria, service_endpoint, delivery_notification_endpoint, interface_name, correlator,status, created_on, last_updated_on, last_updated_by) VALUES (:service_id, :service_name, :service_type, :short_code, :criteria, :service_endpoint, :delivery_notification_endpoint, :interface_name, :correlator, :status, NOW(), NOW(), :last_updated_by)';
+			$query = $database->prepare($sql);
+			
+			$bind_patameters = array(':service_id' => $service_id , ':service_name' => $service_name, ':service_type' => $service_type, ':short_code' => $short_code, ':criteria' => $criteria, ':service_endpoint' => $service_endpoint, ':delivery_notification_endpoint' => $delivery_notification_endpoint, ':interface_name' => $interface_name, ':correlator' => $correlator, ':status' => $status, ':last_updated_by' => $last_updated_by);
+			
+			if ($query->execute($bind_patameters)) {
+				//add last insert id, may be used in the next method calls
+				$last_insert_id = $database->lastInsertId();
+				
+				$row_count = $query->rowCount();
+				$database->commit();
+				
+				if ($row_count == 1) {	
+					return array('result'=>0, 'resultDesc'=>'Saving successful', '_lastInsertID'=>$last_insert_id );
+				}
+			} else {	
+				$this->logger->error(
+					'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}|bind_parameters:{bind_params}',
+					array(
+						'class_mame'=>__CLASS__,
+						'method_name'=>__FUNCTION__,
+						'error'=>$database->errorCode(),
+						'query'=>$sql,
+						'bind_params'=>json_encode($bind_patameters)
+					)
+				);
+				return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 
+			}
+		} catch (PDOException $e) {
+			return  array('result' => 4, 'resultDesc' => 'Error executing a query. Error: '.$e->getMessage()); 
+		}
 		
-		$row_count = $query->rowCount();
-		$errorCode = $database->errorCode();
-		$database->commit();
-		
-		if ($row_count == 1) 
-		{	
-			return array('result'=>0, 'resultDesc'=>'Service added successfully. ', 'service'=>$service_data);
-        }
 		return array('result'=>1, 'resultDesc'=>'Adding service record failed - '.$errorCode, 'service'=>$service_data);
 	} 
 	
@@ -355,7 +400,7 @@ VALUES(:service_id,:service_name,:service_type,:short_code,:criteria,:service_en
      * @param string $service_data service data
 	 * @return array containing query result and service data
      */
-	public static function updateService($service_data)
+	public function updateService($service_data)
 	{	
 		//initialize service data
 		$id="";
@@ -384,28 +429,50 @@ VALUES(:service_id,:service_name,:service_type,:short_code,:criteria,:service_en
 		//check whether ther service exists
 		$query_result = self::getService($service_id);
 		
-		if($query_result['result'] != 0) //query failure
-		{
+		//query failure
+		if($query_result['result'] != 0) {
 			return $query_result; // return the query response error 
 		}
 		
+		$database=null;
+		try {
+			$database = DatabaseFactory::getFactory()->getConnection();
+		} catch (Exception $ex) {
+			return  array('result' => 3, 'resultDesc' => 'Cannot connect to the database. Error: '.$ex->getMessage()); 
+		}
 		
-		// add some logic to handle exceptions in this script
-		$database = DatabaseFactory::getFactory()->getConnection();
-		$database->beginTransaction();
-		$sql='UPDATE tbl_services SET service_id=:service_id, service_name=:service_name, service_type = :service_type, short_code = :short_code, criteria = :criteria, service_endpoint = :service_endpoint, delivery_notification_endpoint = :delivery_notification_endpoint, interface_name = :interface_name, last_updated_on=NOW(), last_updated_by = :last_updated_by WHERE id=:id';
-		$query = $database->prepare($sql);
+		try {		
+			$database->beginTransaction();
+			$sql='UPDATE tbl_services SET service_id=:service_id, service_name=:service_name, service_type = :service_type, short_code = :short_code, criteria = :criteria, service_endpoint = :service_endpoint, delivery_notification_endpoint = :delivery_notification_endpoint, interface_name = :interface_name, last_updated_on=NOW(), last_updated_by = :last_updated_by WHERE id=:id';
+			$query = $database->prepare($sql);
 		
-		$query->execute(array(':id' => $id, ':service_id' => $service_id , ':service_name' => $service_name, ':service_type' => $service_type, ':short_code' => $short_code, ':criteria' => $criteria, ':service_endpoint' => $service_endpoint, ':delivery_notification_endpoint' => $delivery_notification_endpoint, ':interface_name' => $interface_name, ':last_updated_by' => $last_updated_by));
+			$bind_patameters = array(':id' => $id, ':service_id' => $service_id , ':service_name' => $service_name, ':service_type' => $service_type, ':short_code' => $short_code, ':criteria' => $criteria, ':service_endpoint' => $service_endpoint, ':delivery_notification_endpoint' => $delivery_notification_endpoint, ':interface_name' => $interface_name, ':last_updated_by' => $last_updated_by);
+			
+			if ($query->execute($bind_patameters)) {
+				$row_count = $query->rowCount();
+				$errorCode = $database->errorCode();
+				$database->commit();
+				
+				if ($row_count == 1) {	
+					return array('result'=>0, 'resultDesc'=>'Service updated successfully.', 'service'=>$service_data);
+				}
+			} else {	
+				$this->logger->error(
+					'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}|bind_parameters:{bind_params}',
+					array(
+						'class_mame'=>__CLASS__,
+						'method_name'=>__FUNCTION__,
+						'error'=>$database->errorCode(),
+						'query'=>$sql,
+						'bind_params'=>json_encode($bind_patameters)
+					)
+				);
+				return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 
+			}
+		} catch (PDOException $e) {
+			return  array('result' => 4, 'resultDesc' => 'Error executing a query. Error: '.$e->getMessage()); 
+		}
 		
-		$row_count = $query->rowCount();
-		$errorCode = $database->errorCode();
-		$database->commit();
-		
-		if ($row_count == 1) 
-		{	
-			return array('result'=>0, 'resultDesc'=>'Service updated successfully.', 'service'=>$service_data);
-        }
 		return array('result'=>1, 'resultDesc'=>'Updating records failed - '.$errorCode, 'service'=>$service_data);
 	} 
 	
@@ -422,27 +489,51 @@ VALUES(:service_id,:service_name,:service_type,:short_code,:criteria,:service_en
 		//check whether ther service exists
 		$query_result = self::getService($service_id);
 		
-		if($query_result['result'] != 0) //query failure
-		{
+		//query failure
+		if ($query_result['result'] != 0) {
 			return $query_result; // return the query response error 
 		}
 		
-		// add some logic to handle exceptions in this script
-		$database = DatabaseFactory::getFactory()->getConnection();
-		$database->beginTransaction();
-		$sql='DELETE FROM tbl_services WHERE service_id = :service_id LIMIT 1';
-		$query = $database->prepare($sql);
+		$database=null;
+		try {
+			$database = DatabaseFactory::getFactory()->getConnection();
+		} catch (Exception $ex) {
+			return  array('result' => 3, 'resultDesc' => 'Cannot connect to the database. Error: '.$ex->getMessage()); 
+		}
 		
-		$query->execute(array(':service_id' => $service_id));
+		try {		
+			$database->beginTransaction();
+			$sql='DELETE FROM tbl_services WHERE service_id = :service_id LIMIT 1';
+			$query = $database->prepare($sql);
+			
+			$bind_patameters = array(':service_id' => $service_id);
+			
+			if ($query->execute($bind_patameters)) {
+				
+				$row_count = $query->rowCount();
+				$errorCode = $database->errorCode();
+				$database->commit();
+				
+				if ($row_count == 1) {	
+					return array('result'=>0, 'resultDesc'=>'Service deleted successsfully', 'service'=>$query_result['service']);
+				}
+			} else {	
+				$this->logger->error(
+					'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}|bind_parameters:{bind_params}',
+					array(
+						'class_mame'=>__CLASS__,
+						'method_name'=>__FUNCTION__,
+						'error'=>$database->errorCode(),
+						'query'=>$sql,
+						'bind_params'=>json_encode($bind_patameters)
+					)
+				);
+				return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 
+			}
+		} catch (PDOException $e) {
+			return  array('result' => 4, 'resultDesc' => 'Error executing a query. Error: '.$e->getMessage()); 
+		}
 		
-		$row_count = $query->rowCount();
-		$errorCode = $database->errorCode();
-		$database->commit();
-		
-		if ($row_count == 1) 
-		{	
-			return array('result'=>0, 'resultDesc'=>'Service deleted successsfully', 'service'=>$query_result['service']);
-        }
 		return array('result'=>1, 'resultDesc'=>'No record deleted - '.$errorCode, 'service'=>$query_result['service']);
 	} 
 	
