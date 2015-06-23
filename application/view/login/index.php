@@ -1,34 +1,21 @@
-<div class="container">
+<?php 
+use Ssg\Core\Config;
+?>
 
-    <!-- echo out the system feedback (error and success messages) -->
-    <?php $this->renderFeedbackMessages(); ?>
+<!-- echo out the system feedback (error and success messages) -->
+<?php $this->renderFeedbackMessages(); ?>
 
-    <div class="login-page-box">
-        <div class="table-wrapper">
 
-            <!-- login box on left side -->
-            <div class="login-box">
-                <h2>Login here</h2>
-                <form action="<?php echo Config::get('URL'); ?>login/login" method="post">
-                    <input type="text" name="user_name" placeholder="Username or email" required />
-                    <input type="password" name="user_password" placeholder="Password" required />
-                    <label for="set_remember_me_cookie" class="remember-me-label">
-                        <input type="checkbox" name="set_remember_me_cookie" class="remember-me-checkbox" />
-                        Remember me for 2 weeks
-                    </label>
-                    <input type="submit" class="login-submit-button" value="Log in"/>
-                </form>
-                <div class="link-forgot-my-password">
-                    <a href="<?php echo Config::get('URL'); ?>login/requestPasswordReset">I forgot my password</a>
-                </div>
-            </div>
-
-            <!-- register box on right side -->
-            <div class="register-box">
-                <h2>No account yet ?</h2>
-                <a href="<?php echo Config::get('URL'); ?>login/register">Register</a>
-            </div>
-
-        </div>
+<form class="form-signin"  action="<?php echo Config::get('URL'); ?>login/login" method="post">
+    <h2 class="form-signin-heading">Please sign in</h2>
+    <label for="user_name" class="sr-only">Email Address or Username</label>
+    <input type="text" id="user_name" name="user_name" class="form-control" placeholder="Username or Email address" required autofocus>
+    <label for="user_password" class="sr-only">Password</label>
+    <input type="password" id="user_password" name="user_password" class="form-control" placeholder="Password" required>
+    <div class="checkbox">
+      <label for="set_remember_me_cookie" class="remember-me-label">
+        <input type="checkbox" name="set_remember_me_cookie" class="remember-me-checkbox" /> Remember me for 2 weeks
+      </label>
     </div>
-</div>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+</form>

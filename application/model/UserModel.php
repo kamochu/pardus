@@ -1,4 +1,11 @@
 <?php
+namespace Ssg\Model;
+
+use \Ssg\Core\DatabaseFactory;
+use Ssg\Core\Model;
+use Ssg\Core\Config;
+use Ssg\Core\Text;
+use Ssg\Core\Session;
 
 /**
  * UserModel
@@ -132,12 +139,10 @@ class UserModel
     public static function saveNewUserName($user_id, $new_user_name)
     {
         $database = DatabaseFactory::getFactory()->getConnection();
-		$database->beginTransaction();//added the commit leg
 
-        $query = $database->prepare("UPDATE tbl_users SET user_name = :user_name WHERE user_id = :user_id LIMIT 1");
+        $query = $database->prepare("UPDATE users SET user_name = :user_name WHERE user_id = :user_id LIMIT 1");
         $query->execute(array(':user_name' => $new_user_name, ':user_id' => $user_id));
         if ($query->rowCount() == 1) {
-			$database->commit();//added the commit leg
             return true;
         }
         return false;
@@ -154,13 +159,11 @@ class UserModel
     public static function saveNewEmailAddress($user_id, $new_user_email)
     {
         $database = DatabaseFactory::getFactory()->getConnection();
-		$database->beginTransaction();//added the commit leg
 
-        $query = $database->prepare("UPDATE tbl_users SET user_email = :user_email WHERE user_id = :user_id LIMIT 1");
+        $query = $database->prepare("UPDATE users SET user_email = :user_email WHERE user_id = :user_id LIMIT 1");
         $query->execute(array(':user_email' => $new_user_email, ':user_id' => $user_id));
         $count =  $query->rowCount();
         if ($count == 1) {
-			$database->commit(); // add the commit leg
             return true;
         }
         return false;

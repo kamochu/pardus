@@ -9,15 +9,30 @@
  * Configuration for: Error reporting
  * Useful to show every little problem during development, but only show hard / no errors in production.
  * It's a little bit dirty to put this here, but who cares. For development purposes it's totally okay.
+ * 
+ * ini_set does only work if that code is executed. Not useful for code that has parse errors because the 
+ * error will be before the code is executed. Instead write those changes into the php.ini.
  */
+// Report all errors
 error_reporting(E_ALL);
-ini_set("display_errors", 1);
+// DO NOT display errors on front end 
+ini_set("display_errors", 0); 
+// log the errors 
+ini_set("log_errors", 1); 
+//redirect the errors to a log file
+ini_set("error_log", realpath(dirname(__FILE__).'/../../') . '/logs/php_error_'.date('Ymd').'.log'); 
 
 /**
  * Returns the full configuration.
  * This is used by the core/Config class.
  */
 return array(
+	/**
+	 * System version configuration
+	 *
+	 */
+	 'VERSION' => 'SSG_v1.0.3',
+	 'COPYRIGHT' => '&copy; '.date('Y').' SSG. All rights reserved.',
 	/**
 	 * Configuration for: Base URL
 	 * This detects your URL/IP incl. sub-folder automatically. You can also deactivate auto-detection and provide the
@@ -28,9 +43,16 @@ return array(
 	 * Configuration for: Folders
 	 * Usually there's no reason to change this.
 	 */
-	'PATH_CLASS' => realpath(dirname(__FILE__).'/../../') . '/application/core/',
-	'PATH_CONTROLLER' => realpath(dirname(__FILE__).'/../../') . '/application/controller/',
-	'PATH_VIEW' => realpath(dirname(__FILE__).'/../../') . '/application/view/',
+	'PATH_CLASS' => realpath(dirname(__FILE__).'/../../') . '/application/Core/',
+	'PATH_CONTROLLER' => realpath(dirname(__FILE__).'/../../') . '/application/Controller/',
+	'PATH_VIEW' => realpath(dirname(__FILE__).'/../../') . '/application/View/',
+	//dirname(__FILE__).'/../../vendor/log4php/Logger.php';
+	/**
+	 * Configuration for: logger interface
+	 * Used by the log4php library
+	 */
+	'LOG4PHP_CONFIG' => realpath(dirname(__FILE__)) . '/log4php_config.xml',
+	'LOG4PHP_LOGGER_FILE' => realpath(dirname(__FILE__).'/../../') . '/vendor/log4php/Logger.php',
 	/**
 	 * Configuration for: Avatar paths
 	 * Internal path to save avatars. Make sure this folder is writable. The slash at the end is VERY important!
@@ -53,8 +75,8 @@ return array(
 	 * DB_CHARSET The charset, necessary for security reasons. Check Database.php class for more info.
 	 */
 	'DB_TYPE' => 'mysql',
-	'DB_HOST' => '192.168.0.15',
-	'DB_NAME' => 'huge',
+	'DB_HOST' => 'localhost',
+	'DB_NAME' => 'sematel_ssg',
 	'DB_USER' => 'root',
 	'DB_PASS' => 'admin',
 	'DB_PORT' => '3306',
@@ -128,24 +150,27 @@ return array(
 	'EMAIL_VERIFICATION_SUBJECT' => 'Account activation for PROJECT XY',
 	'EMAIL_VERIFICATION_CONTENT' => 'Please click on this link to activate your account: ',
 	/**
+	 * Table display data
+	 */
+	'RECORDS_PER_PAGE' => '7',
+	'CRUMBS' => '20',
+	/**
+	/**
 	 * Configuration for: SP SDP data
 	 */
-	'SP_ID' => '601555',
-	'SP_PASSWORD' => '@Bcd1234',
+	'SP_ID' => '601320',
+	'SP_PASSWORD' => 'Smtel#2015',
 	/**
 	 * Configuration for: SDP SendSms configurations
 	 */
 	'SEND_SMS_DEFAULT_SERVICE_ENDPOINT' => 'http://196.201.216.14:8310/SendSmsService/services/SendSms',
 	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_FLAG' => 1,
-	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_ENDPOINT' => 'http://192.168.0.13/pardus/delivery/receipt/',
+	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_ENDPOINT' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
 	'SEND_SMS_MAXIMUM_RECIPIENTS' => 1,
 	/**
 	 * Configuration for: SDP Get Sms Delivery Status configurations
 	 */
 	'GET_DELIVERY_STATUS_DEFAULT_SERVICE_ENDPOINT' => 'http://196.201.216.14:8310/SendSmsService/services/SendSms',
-	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_FLAG' => 1,
-	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_ENDPOINT' => 'http://192.168.0.13/pardus/delivery/receipt/',
-	'SEND_SMS_MAXIMUM_RECIPIENTS' => 1,
 	/**
 	 * Configuration for: SDP SmsNotificationManager configurations
 	 */
@@ -160,14 +185,22 @@ return array(
 	/**
 	 * Configuration for: Service Configurations - This should be sychroznized with the database parameters
 	 */
-	'SERVICE_STATUS_6013992000001491' => 1,
-	'SERVICE_CODE_6013992000001491' => '29000',
-	'SERVICE_DELIVERY_ENDPOINT_6013992000001491' => 'http://192.168.0.16/pardus/delivery/receipt/',
-	'SERVICE_STATUS_6013992000001492' => 1,
-	'SERVICE_CODE_6013992000001492' => '29111',
-	'SERVICE_DELIVERY_ENDPOINT_6013992000001492' => 'http://192.168.0.16/pardus/delivery/receipt/',
-	'SERVICE_STATUS_6013992000001493' => 1,
-	'SERVICE_CODE_6013992000001493' => '29222',
-	'SERVICE_DELIVERY_ENDPOINT_6013992000001492' => 'http://192.168.0.16/pardus/delivery/receipt/',
-	
+	 //bulk service
+	'SERVICE_STATUS_6013202000002998' => 1,
+	'SERVICE_CODE_6013202000002998' => '901',
+	'SERVICE_DELIVERY_ENDPOINT_6013202000002998' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
+	'SERVICE_STATUS_6013202000002998' => 1,
+	//new service (this comment is not on masika's code)
+	'SERVICE_STATUS_6015512000111462' => 1,
+	'SERVICE_CODE_6015512000111462' => '901',
+	'SERVICE_DELIVERY_ENDPOINT_6015512000111462' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
+	'SERVICE_STATUS_6015512000111462' => 1,
+	//on demand service
+	'SERVICE_CODE_6013202000002997' => '901',
+	'SERVICE_DELIVERY_ENDPOINT_6013202000002997' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
+	'SERVICE_STATUS_6013202000002997' => 1,
+	//subscription service
+	'SERVICE_CODE_6013202000002995' => '901',
+	'SERVICE_DELIVERY_ENDPOINT_6013202000002995' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
+	'SERVICE_STATUS_6013202000002995' => 1,
 );

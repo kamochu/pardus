@@ -1,18 +1,33 @@
 <?php
+namespace Ssg\Model;
+
+use Ssg\Core\Config;
+use Ssg\Core\SDP;
+use Ssg\Core\DatabaseFactory;
+use Ssg\Core\Model;
+use Psr\Log\LoggerInterface;
 
 /**
  * SendModel used in sending messages to external server
  *
  */
-class SendModel
+class SendModel extends Model
 {
+	/**
+     * Construct this object by extending the basic Model class
+     */
+    public function __construct(LoggerInterface $logger = null)
+    {
+        parent::__construct($logger);
+    }
+	
     /**
      * Notify sms process .
      *
      * @param $data mixed the raw request data to be processed
 	 * @return int a result indicating processing status
      */
-    public static function process($data='')
+    public function process($data='')
     {
 		//decode the data
 		$resultData = self::decode($data);
@@ -60,18 +75,9 @@ class SendModel
      * @param $data mixed data to be decoded
 	 * @return int array indicating the processing status and data after processing
      */
-	protected static function decode($data)
+	protected function decode($data)
 	{
-		//dummy data
-		$data['service_id'] = "6013992000001491";
-		$data['link_id'] = "11".date("YmdHisu");
-		$data['linked_incoming_msg_id'] = "26";
-		$data['dest_address'] = "tel:722".date("YmdHis");
-		$data['sender_address'] = "292".date("H");
-		$data['correlator'] = "12".date("YmdHisu");
-		$data['batch_id'] = date("YmdH");
-		$data['message'] = "This is a test message 12".date("YmdHisu");
-		
+		//add some logic to normalize the sender and destination address
 		// add some logic to get data request post data
 		return array('result'=>0, 'resultDesc'=>'Data processing', 'data'=>$data);
 	}
@@ -82,7 +88,7 @@ class SendModel
      * @param $data mixed data to be preprocessed
 	 * @return int array indicating the processing status and data after processing
      */
-	protected static function preProcess($data)
+	protected function preProcess($data)
 	{
 		//check for required parameters 
 		if(!(isset($data['message']) && isset($data['sender_address']) && isset($data['dest_address'])  && isset($data['service_id'])))
@@ -111,14 +117,26 @@ class SendModel
 		}
 		
 		//send request to external server
-		$send_response= SDP::sendSms($data['service_id'], $data['dest_address'], $data['correlator'], $data['sender_address'],  $data['message'], $data['link_id']);
-		$data['sdp_sendsms_result'] = $send_response;
+		$send_response= SDP::sendSms($this->logger, $data['service_id'], $data['dest_address'], $data['correlator'], $data['sender_address'],  $data['message'], $data['link_id']);
 		
+		//log the event
+		$this->logger->debug(
+			'{class_mame}|{method_name}|sdp-result|{request_data}|{sdp_result}|{sdp_result_desc}',
+			array(
+				'class_mame'=>__CLASS__,
+				'method_name'=>__FUNCTION__,
+				'request_data'=>implode('|',$data),
+				'sdp_result'=>$send_response['ResultCode'],
+				'sdp_result_desc'=>$send_response['ResultDesc']
+				)
+		);		
+		$data['sdp_sendsms_result'] = $send_response;
+
 		//check send sms response code
 		if($send_response['ResultCode'] == 0) // success
 		{
 			//send the message to external system 
-			$data['send_ref_id'] = '4040901'.date('YmdHisu'); //To be modified
+			$data['send_ref_id'] =  $send_response['ResultDetails']['result']; //ref id of SDP to be changed with API change
 			$data['status'] = 2; //send sms successful
 			$data['status_desc'] = 'SENT[Message sent]'; //message sent
 		}
@@ -138,7 +156,7 @@ class SendModel
      * @param $data mixed data to be saved
 	 * @return int array indicating the processing status and data after processing
      */
-	protected static function save($data)
+	protected function save($data)
 	{	
 		//initialize the parameters
 		$service_id ='';
@@ -169,23 +187,47 @@ class SendModel
 		if(isset($data['status_desc'])) $status_desc = $data['status_desc'];
 		
 		// add some logic to handle exceptions in this script
-		$database = DatabaseFactory::getFactory()->getConnection();
-		$database->beginTransaction();
-		$sql='INSERT INTO tbl_outbound_messages (service_id, link_id, linked_incoming_msg_id, dest_address, sender_address, correlator, batch_id, message, notify_endpoint, send_timestamp, send_ref_id, status, status_desc, created_on, last_updated_on) VALUES(:service_id, :link_id, :linked_incoming_msg_id, :dest_address, :sender_address, :correlator, :batch_id, :message, :notify_endpoint, NOW(), :send_ref_id, :status,  :status_desc, NOW(), NOW());';
-		$query = $database->prepare($sql);
+		$database=null;
+		try {
+			$database = DatabaseFactory::getFactory()->getConnection();
+		} catch (Exception $ex) {
+			return  array('result' => 3, 'resultDesc' => 'Cannot connect to the database. Error: '.$ex->getMessage()); 
+		}
 		
-		$query->execute(array(':service_id' => $service_id , ':link_id' => $link_id, ':linked_incoming_msg_id' => $linked_incoming_msg_id, ':dest_address' => $dest_address, ':sender_address' => $sender_address, ':correlator' => $correlator, ':batch_id' => $batch_id, ':message' => $message, ':notify_endpoint' => $notify_endpoint, ':send_ref_id' => $send_ref_id, ':status' => $status, ':status_desc' => $status_desc));
-		
-		//add last insert id, may be used in the next method calls
-		$data['_lastInsertID'] = $database->lastInsertId();
-		
-		$row_count = $query->rowCount();
-		$database->commit();
-		
-		if ($row_count == 1) 
-		{	
-			return array('result'=>0, 'resultDesc'=>'Saving successful', 'data'=>$data);
-        }
+		//saving the data
+		try{
+			$database->beginTransaction();
+			$sql='INSERT INTO tbl_outbound_messages (service_id, link_id, linked_incoming_msg_id, dest_address, sender_address, correlator, batch_id, message, notify_endpoint, send_timestamp, send_ref_id, status, status_desc, created_on, last_updated_on) VALUES(:service_id, :link_id, :linked_incoming_msg_id, :dest_address, :sender_address, :correlator, :batch_id, :message, :notify_endpoint, NOW(), :send_ref_id, :status,  :status_desc, NOW(), NOW());';
+			$query = $database->prepare($sql);
+			$bind_parameters = array(':service_id' => $service_id , ':link_id' => $link_id, ':linked_incoming_msg_id' => $linked_incoming_msg_id, ':dest_address' => $dest_address, ':sender_address' => $sender_address, ':correlator' => $correlator, ':batch_id' => $batch_id, ':message' => $message, ':notify_endpoint' => $notify_endpoint, ':send_ref_id' => $send_ref_id, ':status' => $status, ':status_desc' => $status_desc);
+			
+			if ($query->execute($bind_parameters)) {
+				//add last insert id, may be used in the next method calls
+				$data['_lastInsertID'] = $database->lastInsertId();
+				
+				$row_count = $query->rowCount();
+				$database->commit();
+				
+				if ($row_count == 1) {	
+					return array('result'=>0, 'resultDesc'=>'Saving successful', 'data'=>$data);
+				}
+				
+			} else {
+				$this->logger->error(
+					'{class_mame}|{method_name}|{service_id}|error executing the query|{query}|bind_parameters:{bind_params}',
+					array(
+						'class_mame'=>__CLASS__,
+						'method_name'=>__FUNCTION__,
+						'service_id'=>$service_id,
+						'query'=>$sql,
+						'bind_params'=>json_encode($bind_parameters)
+					)
+				);
+				return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 
+			}
+		} catch (PDOException $e) {
+			return  array('result' => 4, 'resultDesc' => 'Error executing a query. Error: '.$e->getMessage()); 
+		}
 		
 		return array('result'=>14, 'resultDesc'=>'Saving record failed', 'data'=>$data);
 	}
@@ -196,7 +238,7 @@ class SendModel
      * @param $data mixed data to be saved
 	 * @return int array indicating the processing status and data after processing
      */
-	protected static function encode($data)
+	protected function encode($data)
 	{
 		return array('result'=>0, 'resultDesc'=>'Encoding successful', 'data'=>$data);
 	}
@@ -208,7 +250,7 @@ class SendModel
      * @param $data mixed data to be processed
 	 * @return int array indicating the processing status and data after processing
      */
-	protected static function hook($data)
+	protected function hook($data)
 	{
 		return array('result'=>"0", 'resultDesc'=>'Hook execution successful',  'data'=>$data);
 	}

@@ -1,4 +1,8 @@
 <?php
+namespace Ssg\Core;
+
+use Psr\Log\LoggerInterface;
+
 /*
 * The class has Utility functions on SDP to access services services on; sendSms, 
 * reqister and de-register service end point, getSmsDeliveryStatus, etc
@@ -41,7 +45,7 @@ class SDP{
 	*
 	* @return array associative array with: ResultCode, ResultDesc, and ResultDetails, ResultDetails and XML sent
 	*/
-	public static function sendSms($kmp_service_id, $kmp_recipients,$kmp_correlator,$kmp_code,$kmp_message,$kmp_linkid=''){
+	public static function sendSms(LoggerInterface $logger, $kmp_service_id, $kmp_recipients,$kmp_correlator,$kmp_code,$kmp_message,$kmp_linkid=''){
 		
 		$kmp_spid=Config::get('SP_ID'); // sp id from configuration file
 		$kmp_timestamp=date("YmdHis"); //current timestamp
@@ -100,6 +104,19 @@ class SDP{
 		
 		//Send the soap request to the server
 		$result = $client->send($bodyxml, $bsoapaction);
+		
+		//log the send request
+		$logger->debug(
+			"{class_mame}|{method_name}|{service_id}|send-sms|{endpoint}|{soapaction}|{request}",
+			array(
+				'class_mame'=>__CLASS__,
+				'method_name'=>__FUNCTION__,
+				'service_id'=>$kmp_service_id, 
+				'endpoint'=>Config::get('SEND_SMS_DEFAULT_SERVICE_ENDPOINT'),
+				'soapaction'=>$bsoapaction,
+				'request'=>$bodyxml
+			)
+		);
 		
 		//check for fault and return
 		if ($client->fault) {
@@ -196,7 +213,7 @@ class SDP{
 	*
 	* @return array associative array with: ResultCode, ResultDesc, and ResultDetails, ResultDetails and XML sent
 	*/
-	public static function startSmsNotification($kmp_service_id,$kmp_notify_endpoint,$kmp_correlator,$kmp_code,$kmp_criteria=''){
+	public static function startSmsNotification(LoggerInterface $logger,$kmp_service_id,$kmp_notify_endpoint,$kmp_correlator,$kmp_code,$kmp_criteria=''){
 	
 		$kmp_spid=Config::get('SP_ID'); // sp id from configuration file
 		$kmp_timestamp=date("YmdHis"); //current timestamp
@@ -204,32 +221,46 @@ class SDP{
 		
 		$bodyxml = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://www.huawei.com.cn/schema/common/v2_1" xmlns:loc="http://www.csapi.org/schema/parlayx/sms/notification_manager/v2_3/local"><soapenv:Header><RequestSOAPHeader xmlns="http://www.huawei.com.cn/schema/common/v2_1"><spId>'.$kmp_spid.'</spId><spPassword>'.$kmp_sppwd.'</spPassword><serviceId>'.$kmp_service_id.'</serviceId><timeStamp>'.$kmp_timestamp.'</timeStamp></RequestSOAPHeader></soapenv:Header><soapenv:Body><loc:startSmsNotification><loc:reference><endpoint>'.$kmp_notify_endpoint.'</endpoint><interfaceName>startSmsNotification</interfaceName><correlator>'.$kmp_correlator.'</correlator></loc:reference><loc:smsServiceActivationNumber>'.$kmp_code.'</loc:smsServiceActivationNumber><loc:criteria>'.$kmp_criteria.'</loc:criteria></loc:startSmsNotification></soapenv:Body></soapenv:Envelope>';
 		
+		
 		//create the client
 		$client = new nusoap_client(Config::get('SMS_NOTIFICATION_MANAGER_ENDPOINT'),true);	
 		$bsoapaction = "";
 		$client->soap_defencoding = 'utf-8';
 		$client->useHTTPPersistentConnection();
 		
+		//log the send request
+		$logger->debug(
+			"{class_mame}|{method_name}|{service_id}|sending start sms notification|{endpoint}|{soapaction}|{request}",
+			array(
+				'class_mame'=>__CLASS__,
+				'method_name'=>__FUNCTION__,
+				'service_id'=>$kmp_service_id,
+				'endpoint'=>Config::get('SMS_NOTIFICATION_MANAGER_ENDPOINT'),
+				'soapaction'=>$bsoapaction,
+				'request'=>$bodyxml
+			)
+		);
+		
 		//send the request to the server
 		$result = $client->send($bodyxml, $bsoapaction);
-		
+
 		//check for fault and return
 		if ($client->fault) {
-		  return array('ResultCode'=>1,'ResultDesc'=>'SOAP Fault','ResultDetails'=>$result, 'xml' => $bodyxml);
+		  return array('ResultCode'=>1,'ResultDesc'=>'SOAP Fault','ResultDetails'=>$result, 'xml' => $bodyxml, 'endpoint'=>Config::get('SMS_NOTIFICATION_MANAGER_ENDPOINT'));
 		}
 		
 		// check for errors and return
 		$err = $client->getError();
 		if ($err) {
-			return array('ResultCode'=>2,'ResultDesc'=>'Error','ResultDetails'=>$err, 'xml' => $bodyxml);
+			return array('ResultCode'=>2,'ResultDesc'=>'Error','ResultDetails'=>$err, 'xml' => $bodyxml, 'endpoint'=>Config::get('SMS_NOTIFICATION_MANAGER_ENDPOINT'));
 		}
 		else{
 			//check for fault code
 			if(isset($result['faultcode'])){
-				return array('ResultCode'=>'3','ResultDesc'=>'Fault - '.$result['faultcode'],'ResultDetails'=>$result['faultstring'], 'xml' => $bodyxml);
+				return array('ResultCode'=>'3','ResultDesc'=>'Fault - '.$result['faultcode'],'ResultDetails'=>$result['faultstring'], 'xml' => $bodyxml, 'endpoint'=>Config::get('SMS_NOTIFICATION_MANAGER_ENDPOINT'));
 			}
 			//return success
-			return array('ResultCode'=>0,'ResultDesc'=>'Operation Successful.','ResultDetails'=>$result, 'xml' => $bodyxml);
+			return array('ResultCode'=>0,'ResultDesc'=>'Operation Successful.','ResultDetails'=>$result, 'xml' => $bodyxml, 'endpoint'=>Config::get('SMS_NOTIFICATION_MANAGER_ENDPOINT'));
 		}
 	}
 	
@@ -243,7 +274,7 @@ class SDP{
 	*
 	* @return array associative array with: ResultCode, ResultDesc, and ResultDetails, ResultDetails
 	*/
-	public static function stopSmsNotification($kmp_service_id, $kmp_correlator)
+	public static function stopSmsNotification(LoggerInterface $logger, $kmp_service_id, $kmp_correlator)
 	{
 		$kmp_spid=Config::get('SP_ID'); // sp id from configuration file
 		$kmp_timestamp=date("YmdHis"); //current timestamp
@@ -260,23 +291,36 @@ class SDP{
 		//send the request to the server
 		$result = $client->send($bodyxml, $bsoapaction);
 		
+		//log the send request
+		$logger->debug(
+			"{class_mame}|{method_name}|{service_id}|sending stop sms notification|{endpoint}|{soapaction}|{request}",
+			array(
+				'class_mame'=>__CLASS__,
+				'method_name'=>__FUNCTION__,
+				'service_id'=>$kmp_service_id, 
+				'endpoint'=>Config::get('SMS_NOTIFICATION_MANAGER_ENDPOINT'),
+				'soapaction'=>$bsoapaction,
+				'request'=>$bodyxml
+			)
+		);
+		
 		//check for fault and return
 		if ($client->fault) {
-		  return array('ResultCode'=>1,'ResultDesc'=>'SOAP Fault','ResultDetails'=>$result, 'xml' => $bodyxml);
+		  return array('ResultCode'=>1,'ResultDesc'=>'SOAP Fault','ResultDetails'=>$result, 'xml' => $bodyxml, 'endpoint'=>Config::get('SMS_NOTIFICATION_MANAGER_ENDPOINT'));
 		}
 		
 		// check for errors and return
 		$err = $client->getError();
 		if ($err) {
-			return array('ResultCode'=>2,'ResultDesc'=>'Error','ResultDetails'=>$err, 'xml' => $bodyxml);
+			return array('ResultCode'=>2,'ResultDesc'=>'Error','ResultDetails'=>$err, 'xml' => $bodyxml, 'endpoint'=>Config::get('SMS_NOTIFICATION_MANAGER_ENDPOINT'));
 		}
 		else{
 			//check for fault code
 			if(isset($result['faultcode'])){
-				return array('ResultCode'=>'3','ResultDesc'=>'Fault - '.$result['faultcode'],'ResultDetails'=>$result['faultstring'], 'xml' => $bodyxml);
+				return array('ResultCode'=>'3','ResultDesc'=>'Fault - '.$result['faultcode'],'ResultDetails'=>$result['faultstring'], 'xml' => $bodyxml, 'endpoint'=>Config::get('SMS_NOTIFICATION_MANAGER_ENDPOINT'));
 			}
 			//return success
-			return array('ResultCode'=>0,'ResultDesc'=>'Operation Successful.','ResultDetails'=>$result, 'xml' => $bodyxml);
+			return array('ResultCode'=>0,'ResultDesc'=>'Operation Successful.','ResultDetails'=>$result, 'xml' => $bodyxml, 'endpoint'=>Config::get('SMS_NOTIFICATION_MANAGER_ENDPOINT'));
 		}
 	}
 } //end of class

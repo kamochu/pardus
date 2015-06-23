@@ -1,24 +1,24 @@
 <?php
 
 /**
- * This function auto loads classes. Checks the core and model 
- * folders within the application
+ * This file is used in loading the class loader
  *
  * @param $class name of the class to be loaded
  * @see http://php.net/manual/en/function.spl-autoload-register.php
  */
-function my_class_autoloader($class) {
-	$file_name= '../application/core/' . $class . '.php';
-	
-	if(!file_exists($file_name)){ 
-		//check the core application folder
-		$file_name= '../application/model/' . $class . '.php';
-	}
-	
-	//include the file
-	include $file_name;
-    
-}
 
-//register the autoloader function  named 'my_class_autoloader'
-spl_autoload_register('my_class_autoloader');
+require 'Psr/Autoloader.php'; 
+
+// instantiate the loader
+$loader = new \Psr\Autoloader;
+
+// register the autoloader
+$loader->register();
+
+//add the Psr namespace
+$loader->addNamespace('Psr', realpath(dirname(__FILE__)) . '/Psr');
+$loader->addNamespace('Ssg', realpath(dirname(__FILE__).'/../') . '/application');
+
+
+
+

@@ -1,4 +1,5 @@
 <?php
+namespace Ssg\Core;
 
 /**
  * This is under development. Expect changes!

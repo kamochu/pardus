@@ -1,4 +1,13 @@
 <?php
+namespace Ssg\Controller;
+
+use Ssg\Core\Controller;
+use Ssg\Core\Request;
+use Ssg\Core\Redirect;
+use Ssg\Core\Session;
+use Ssg\Core\Auth;
+use Ssg\Model\LoginModel;
+use Ssg\Model\UserModel;
 
 /**
  * LoginController
@@ -41,7 +50,7 @@ class LoginController extends Controller
 
         // check login status: if true, then redirect user login/showProfile, if false, then to login form again
         if ($login_successful) {
-            Redirect::to('login/showProfile');
+            Redirect::to('index/index');
         } else {
             Redirect::to('login/index');
         }
@@ -67,7 +76,7 @@ class LoginController extends Controller
 
         // if login successful, redirect to dashboard/index ...
         if ($login_successful) {
-            Redirect::to('dashboard/index');
+            Redirect::to('index/index');
         } else {
             // if not, delete cookie (outdated? attack?) and route user to login form to prevent infinite login loops
             LoginModel::deleteCookie();
@@ -91,143 +100,6 @@ class LoginController extends Controller
         ));
     }
 
-    /**
-     * Show edit-my-username page
-     * Auth::checkAuthentication() makes sure that only logged in users can use this action and see this page
-     */
-    public function editUsername()
-    {
-        Auth::checkAuthentication();
-        $this->View->render('login/editUsername');
-    }
-
-    /**
-     * Edit user name (perform the real action after form has been submitted)
-     * Auth::checkAuthentication() makes sure that only logged in users can use this action
-     */
-    public function editUsername_action()
-    {
-        Auth::checkAuthentication();
-        UserModel::editUserName(Request::post('user_name'));
-        Redirect::to('login/index');
-    }
-
-    /**
-     * Show edit-my-user-email page
-     * Auth::checkAuthentication() makes sure that only logged in users can use this action and see this page
-     */
-    public function editUserEmail()
-    {
-        Auth::checkAuthentication();
-        $this->View->render('login/editUserEmail');
-    }
-
-    /**
-     * Edit user email (perform the real action after form has been submitted)
-     * Auth::checkAuthentication() makes sure that only logged in users can use this action and see this page
-     */
-    // make this POST
-    public function editUserEmail_action()
-    {
-        Auth::checkAuthentication();
-        UserModel::editUserEmail(Request::post('user_email'));
-        Redirect::to('login/editUserEmail');
-    }
-
-    /**
-     * Edit avatar
-     * Auth::checkAuthentication() makes sure that only logged in users can use this action and see this page
-     */
-    public function editAvatar()
-    {
-        Auth::checkAuthentication();
-        $this->View->render('login/editAvatar', array(
-            'avatar_file_path' => AvatarModel::getPublicUserAvatarFilePathByUserId(Session::get('user_id'))
-        ));
-    }
-
-    /**
-     * Perform the upload of the avatar
-     * Auth::checkAuthentication() makes sure that only logged in users can use this action and see this page
-     * POST-request
-     */
-    public function uploadAvatar_action()
-    {
-        Auth::checkAuthentication();
-        AvatarModel::createAvatar();
-        Redirect::to('login/editAvatar');
-    }
-
-    /**
-     * Delete the current user's avatar
-     * Auth::checkAuthentication() makes sure that only logged in users can use this action and see this page
-     */
-    public function deleteAvatar_action()
-    {
-        Auth::checkAuthentication();
-        AvatarModel::deleteAvatar(Session::get("user_id"));
-        Redirect::to('login/editAvatar');
-    }
-
-    /**
-     * Show the change-account-type page
-     * Auth::checkAuthentication() makes sure that only logged in users can use this action and see this page
-     */
-    public function changeUserRole()
-    {
-        Auth::checkAuthentication();
-        $this->View->render('login/changeUserRole');
-    }
-
-    /**
-     * Perform the account-type changing
-     * Auth::checkAuthentication() makes sure that only logged in users can use this action
-     * POST-request
-     */
-    public function changeUserRole_action()
-    {
-        Auth::checkAuthentication();
-
-        if (Request::post('user_account_upgrade')) {
-            // "2" is quick & dirty account type 2, something like "premium user" maybe. you got the idea :)
-            UserRoleModel::changeUserRole(2);
-        }
-
-        if (Request::post('user_account_downgrade')) {
-            // "1" is quick & dirty account type 1, something like "basic user" maybe.
-            UserRoleModel::changeUserRole(1);
-        }
-
-        Redirect::to('login/changeUserRole');
-    }
-
-    /**
-     * Register page
-     * Show the register form, but redirect to main-page if user is already logged-in
-     */
-    public function register()
-    {
-        if (LoginModel::isUserLoggedIn()) {
-            Redirect::home();
-        } else {
-            $this->View->render('login/register');
-        }
-    }
-
-    /**
-     * Register page action
-     * POST-request after form submit
-     */
-    public function register_action()
-    {
-        $registration_successful = RegistrationModel::registerNewUser();
-
-        if ($registration_successful) {
-            Redirect::to('login/index');
-        } else {
-            Redirect::to('login/register');
-        }
-    }
 
     /**
      * Verify user after activation mail link opened

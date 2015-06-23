@@ -1,4 +1,11 @@
 <?php
+namespace Ssg\Model;
+
+use \Ssg\Core\DatabaseFactory;
+use Ssg\Core\Model;
+use Ssg\Core\Config;
+use Ssg\Core\Text;
+use Ssg\Core\Session;
 
 /**
  * LoginModel
@@ -7,6 +14,7 @@
  */
 class LoginModel
 {
+	
     /**
      * Login process (for DEFAULT user accounts).
      *
@@ -55,7 +63,7 @@ class LoginModel
     }
 
 	/**
-	 * Validates the inputs of the users, checks if password is correct etc.
+	 * Validates the inputs of the tbl_users, checks if password is correct etc.
 	 * If successful, user is returned
 	 *
 	 * @param $user_name
@@ -163,8 +171,8 @@ class LoginModel
         Session::set('user_provider_type', 'DEFAULT');
 
         // get and set avatars
-        Session::set('user_avatar_file', AvatarModel::getPublicUserAvatarFilePathByUserId($user_id));
-        Session::set('user_gravatar_image_url', AvatarModel::getGravatarLinkByEmail($user_email));
+        //Session::set('user_avatar_file', AvatarModel::getPublicUserAvatarFilePathByUserId($user_id));
+        //Session::set('user_gravatar_image_url', AvatarModel::getGravatarLinkByEmail($user_email));
 
         // finally, set user as logged-in
         Session::set('user_logged_in', true);
@@ -178,7 +186,6 @@ class LoginModel
     public static function incrementFailedLoginCounterOfUser($user_name)
     {
         $database = DatabaseFactory::getFactory()->getConnection();
-		$database->beginTransaction();
 
         $sql = "UPDATE tbl_users
                    SET user_failed_logins = user_failed_logins+1, user_last_failed_login = :user_last_failed_login
@@ -186,7 +193,6 @@ class LoginModel
                  LIMIT 1";
         $sth = $database->prepare($sql);
         $sth->execute(array(':user_name' => $user_name, ':user_last_failed_login' => time() ));
-		$database->commit();
     }
 
     /**
@@ -197,7 +203,6 @@ class LoginModel
     public static function resetFailedLoginCounterOfUser($user_name)
     {
         $database = DatabaseFactory::getFactory()->getConnection();
-		$database->beginTransaction();
 
         $sql = "UPDATE tbl_users
                    SET user_failed_logins = 0, user_last_failed_login = NULL
@@ -205,7 +210,6 @@ class LoginModel
                  LIMIT 1";
         $sth = $database->prepare($sql);
         $sth->execute(array(':user_name' => $user_name));
-		$database->commit();
     }
 
     /**
@@ -217,13 +221,11 @@ class LoginModel
     public static function saveTimestampOfLoginOfUser($user_name)
     {
         $database = DatabaseFactory::getFactory()->getConnection();
-		$database->beginTransaction();
 
         $sql = "UPDATE tbl_users SET user_last_login_timestamp = :user_last_login_timestamp
                 WHERE user_name = :user_name LIMIT 1";
         $sth = $database->prepare($sql);
         $sth->execute(array(':user_name' => $user_name, ':user_last_login_timestamp' => time()));
-		$database->commit();
     }
 
     /**
@@ -235,7 +237,6 @@ class LoginModel
     public static function setRememberMeInDatabaseAndCookie($user_id)
     {
         $database = DatabaseFactory::getFactory()->getConnection();
-		$database->beginTransaction();
 
         // generate 64 char random string
         $random_token_string = hash('sha256', mt_rand());
@@ -244,8 +245,6 @@ class LoginModel
         $sql = "UPDATE tbl_users SET user_remember_me_token = :user_remember_me_token WHERE user_id = :user_id LIMIT 1";
         $sth = $database->prepare($sql);
         $sth->execute(array(':user_remember_me_token' => $random_token_string, ':user_id' => $user_id));
-		
-		$database->commit();
 
         // generate cookie string that consists of user id, random string and combined hash of both
         $cookie_string_first_part = $user_id . ':' . $random_token_string;
