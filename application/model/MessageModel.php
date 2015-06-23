@@ -51,10 +51,12 @@ class MessageModel extends Model
 			$sql= $sql." AND service_id=:service_id";
 			$parameters[':service_id']=$service_id;
 		}
+		$query_total = $sql; // copy query to be used to get the total number of reords (without the group by and limit clause)
 		$sql= $sql.' ORDER BY message_id '.$order.' LIMIT '.$start_index.', '.$limit;
 		
 		// add some logic to handle exceptions in this script
 		$row_count=0; 
+		$total_records=0;
 		$messages='';
 		$database=null;
 		try {
@@ -72,12 +74,31 @@ class MessageModel extends Model
 		}
 		
 		try {	
+			//get total records for pagination
+			$query = $database->prepare($query_total);	
+			if ($query->execute($parameters)) {
+				$total_records = $query->rowCount();
+			} else {	
+				$this->logger->error(
+					'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}|bind_parameters:{bind_params}',
+					array(
+						'class_mame'=>__CLASS__,
+						'method_name'=>__FUNCTION__,
+						'error'=>$database->errorCode(),
+						'query'=>$sql,
+						'bind_params'=>json_encode($parameters)
+					)
+				);
+				return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 
+			}
+			
+			//get records
 			$query = $database->prepare($sql);	
 			if ($query->execute($parameters)) {
 				$messages = $query->fetchAll();
 				$row_count = $query->rowCount();
 				if ($row_count > 0)  {	
-					return array('result'=>0, 'resultDesc'=>'Records retrieved successfully.', '_recordsRetrieved' => $row_count, 'messages'=>$messages);
+					return array('result'=>0, 'resultDesc'=>'Records retrieved successfully.', '_recordsRetrieved' => $row_count, '_totalRecords' => $total_records,  'messages'=>$messages);
 				}
 			} else {	
 				$this->logger->error(
@@ -147,10 +168,12 @@ class MessageModel extends Model
 			$sql= $sql." AND batch_id=:batch_id";
 			$parameters[':batch_id']=$batch_id;
 		}
+		$query_total = $sql; // copy query to be used to get the total number of reords (without the group by and limit clause)
 		$sql= $sql.' ORDER BY message_id '.$order.' LIMIT '.$start_index.', '.$limit;
 		
 		// add some logic to handle exceptions in this script
 		$row_count=0; 
+		$total_records=0;
 		$messages='';
 		$database=null;
 		try {
@@ -167,13 +190,33 @@ class MessageModel extends Model
 			return  array('result' => 3, 'resultDesc' => 'Cannot connect to the database. Error: '.$ex->getMessage()); 
 		}
 		
-		try {	
+		try {
+			
+			//get total records for pagination
+			$query = $database->prepare($query_total);	
+			if ($query->execute($parameters)) {
+				$total_records = $query->rowCount();
+			} else {	
+				$this->logger->error(
+					'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}|bind_parameters:{bind_params}',
+					array(
+						'class_mame'=>__CLASS__,
+						'method_name'=>__FUNCTION__,
+						'error'=>$database->errorCode(),
+						'query'=>$sql,
+						'bind_params'=>json_encode($parameters)
+					)
+				);
+				return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 
+			}
+			
+			//get records
 			$query = $database->prepare($sql);	
 			if ($query->execute($parameters)) {
 				$messages = $query->fetchAll();
 				$row_count = $query->rowCount();
 				if ($row_count > 0)  {	
-					return array('result'=>0, 'resultDesc'=>'Records retrieved successfully.', '_recordsRetrieved' => $row_count, 'messages'=>$messages);
+					return array('result'=>0, 'resultDesc'=>'Records retrieved successfully.', '_recordsRetrieved' => $row_count, '_totalRecords' => $total_records,  'messages'=>$messages);
 				}
 			} else {	
 				$this->logger->error(
@@ -243,10 +286,12 @@ class MessageModel extends Model
 			$sql= $sql." AND update_type=:update_type";
 			$parameters[':update_type']=$update_type;
 		}
+		$query_total = $sql; // copy query to be used to get the total number of reords (without the group by and limit clause)
 		$sql= $sql.' ORDER BY id '.$order.' LIMIT '.$start_index.', '.$limit;
 		
 		// add some logic to handle exceptions in this script
 		$row_count=0; 
+		$total_records=0;
 		$messages='';
 		$database=null;
 		try {
@@ -264,12 +309,31 @@ class MessageModel extends Model
 		}
 		
 		try {	
+			//get total records for pagination
+			$query = $database->prepare($query_total);	
+			if ($query->execute($parameters)) {
+				$total_records = $query->rowCount();
+			} else {	
+				$this->logger->error(
+					'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}|bind_parameters:{bind_params}',
+					array(
+						'class_mame'=>__CLASS__,
+						'method_name'=>__FUNCTION__,
+						'error'=>$database->errorCode(),
+						'query'=>$sql,
+						'bind_params'=>json_encode($parameters)
+					)
+				);
+				return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 
+			}
+			
+			//get records
 			$query = $database->prepare($sql);	
 			if ($query->execute($parameters)) {
 				$messages = $query->fetchAll();
 				$row_count = $query->rowCount();
 				if ($row_count > 0)  {	
-					return array('result'=>0, 'resultDesc'=>'Records retrieved successfully.', '_recordsRetrieved' => $row_count, 'messages'=>$messages);
+					return array('result'=>0, 'resultDesc'=>'Records retrieved successfully.', '_recordsRetrieved' => $row_count, '_totalRecords' => $total_records,  'messages'=>$messages);
 				}
 			} else {	
 				$this->logger->error(
@@ -328,10 +392,12 @@ class MessageModel extends Model
 			$sql= $sql." AND correlator=:correlator";
 			$parameters[':correlator']=$correlator;
 		}
+		$query_total = $sql; // copy query to be used to get the total number of reords (without the group by and limit clause)
 		$sql= $sql.' ORDER BY id '.$order.' LIMIT '.$start_index.', '.$limit;
 		
 		// add some logic to handle exceptions in this script
 		$row_count=0; 
+		$total_records=0;
 		$messages='';
 		$database=null;
 		try {
@@ -349,12 +415,31 @@ class MessageModel extends Model
 		}
 		
 		try {	
+			//get total records for pagination
+			$query = $database->prepare($query_total);	
+			if ($query->execute($parameters)) {
+				$total_records = $query->rowCount();
+			} else {	
+				$this->logger->error(
+					'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}|bind_parameters:{bind_params}',
+					array(
+						'class_mame'=>__CLASS__,
+						'method_name'=>__FUNCTION__,
+						'error'=>$database->errorCode(),
+						'query'=>$sql,
+						'bind_params'=>json_encode($parameters)
+					)
+				);
+				return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 
+			}
+			
+			//get records
 			$query = $database->prepare($sql);	
 			if ($query->execute($parameters)) {
 				$messages = $query->fetchAll();
 				$row_count = $query->rowCount();
 				if ($row_count > 0)  {	
-					return array('result'=>0, 'resultDesc'=>'Records retrieved successfully.', '_recordsRetrieved' => $row_count, 'messages'=>$messages);
+					return array('result'=>0, 'resultDesc'=>'Records retrieved successfully.', '_recordsRetrieved' => $row_count, '_totalRecords' => $total_records,  'messages'=>$messages);
 				}
 			} else {	
 				$this->logger->error(

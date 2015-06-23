@@ -209,9 +209,7 @@ class ServiceModel extends Model
 		
 		//prepare and execute the query
 		try {		
-			$sql = "SELECT id, service_id, service_name, service_type, short_code, service_endpoint, 
-				criteria, delivery_notification_endpoint, interface_name, correlator, status
-                FROM tbl_services WHERE service_id = :service_id LIMIT 1";
+			$sql = "SELECT * FROM tbl_services WHERE service_id = :service_id LIMIT 1";
 			$query = $database->prepare($sql);
 			$bind_parameters = array(':service_id' => $service_id);
 			
@@ -348,6 +346,17 @@ class ServiceModel extends Model
 		if(isset($service_data['status'])) $status=$service_data['status'];
 		if(isset($service_data['last_updated_by'])) $last_updated_by=$service_data['last_updated_by'];
 		
+		if ( 
+			empty($service_id) || !isset($service_id) || 
+			empty($service_name) || !isset($service_name) || 
+			empty($service_type) || !isset($service_type) || 
+			empty($short_code) || !isset($short_code)  ||
+			empty($service_endpoint) || !isset($service_endpoint)  ||
+			empty($delivery_notification_endpoint) || !isset($delivery_notification_endpoint)  
+		) {
+			return  array('result' => 10, 'resultDesc' => 'Missing mandatory data. The following are required; service id, service name, service type, short code, service url, and delivery notification url'); 
+		}
+		
 		$database=null;
 		try {
 			$database = DatabaseFactory::getFactory()->getConnection();
@@ -361,6 +370,17 @@ class ServiceModel extends Model
 			$query = $database->prepare($sql);
 			
 			$bind_patameters = array(':service_id' => $service_id , ':service_name' => $service_name, ':service_type' => $service_type, ':short_code' => $short_code, ':criteria' => $criteria, ':service_endpoint' => $service_endpoint, ':delivery_notification_endpoint' => $delivery_notification_endpoint, ':interface_name' => $interface_name, ':correlator' => $correlator, ':status' => $status, ':last_updated_by' => $last_updated_by);
+			
+			$this->logger->debug(
+				'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}|bind_parameters:{bind_params}',
+				array(
+					'class_mame'=>__CLASS__,
+					'method_name'=>__FUNCTION__,
+					'error'=>$database->errorCode(),
+					'query'=>$sql,
+					'bind_params'=>json_encode($bind_patameters)
+				)
+			);	
 			
 			if ($query->execute($bind_patameters)) {
 				//add last insert id, may be used in the next method calls
@@ -388,6 +408,16 @@ class ServiceModel extends Model
 		} catch (PDOException $e) {
 			return  array('result' => 4, 'resultDesc' => 'Error executing a query. Error: '.$e->getMessage()); 
 		}
+		$this->logger->error(
+			'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}|bind_parameters:{bind_params}',
+			array(
+				'class_mame'=>__CLASS__,
+				'method_name'=>__FUNCTION__,
+				'error'=>$database->errorCode(),
+				'query'=>$sql,
+				'bind_params'=>json_encode($bind_patameters)
+			)
+		);
 		
 		return array('result'=>1, 'resultDesc'=>'Adding service record failed - '.$errorCode, 'service'=>$service_data);
 	} 
@@ -448,6 +478,17 @@ class ServiceModel extends Model
 		
 			$bind_patameters = array(':id' => $id, ':service_id' => $service_id , ':service_name' => $service_name, ':service_type' => $service_type, ':short_code' => $short_code, ':criteria' => $criteria, ':service_endpoint' => $service_endpoint, ':delivery_notification_endpoint' => $delivery_notification_endpoint, ':interface_name' => $interface_name, ':last_updated_by' => $last_updated_by);
 			
+			$this->logger->debug(
+				'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}|bind_parameters:{bind_params}',
+				array(
+					'class_mame'=>__CLASS__,
+					'method_name'=>__FUNCTION__,
+					'error'=>$database->errorCode(),
+					'query'=>$sql,
+					'bind_params'=>json_encode($bind_patameters)
+				)
+			);	
+			
 			if ($query->execute($bind_patameters)) {
 				$row_count = $query->rowCount();
 				$errorCode = $database->errorCode();
@@ -485,15 +526,7 @@ class ServiceModel extends Model
 	 * @return array containing query result and service data
      */
 	public function deleteService($service_id)
-	{
-		//check whether ther service exists
-		$query_result = self::getService($service_id);
-		
-		//query failure
-		if ($query_result['result'] != 0) {
-			return $query_result; // return the query response error 
-		}
-		
+	{	
 		$database=null;
 		try {
 			$database = DatabaseFactory::getFactory()->getConnection();
@@ -515,7 +548,7 @@ class ServiceModel extends Model
 				$database->commit();
 				
 				if ($row_count == 1) {	
-					return array('result'=>0, 'resultDesc'=>'Service deleted successsfully', 'service'=>$query_result['service']);
+					return array('result'=>0, 'resultDesc'=>'Service deleted successsfully', 'service'=> new stdClass()); ;
 				}
 			} else {	
 				$this->logger->error(
@@ -543,12 +576,33 @@ class ServiceModel extends Model
 	 * 
 	 * @return array containing query result and service data
      */
-	public function getServices($start_index=0, $limit=10, $order='DESC')
+	public function getServices($service_id='', $service_type='', $short_code='', $start_index=0, $limit=10, $order='DESC')
 	{
-        $sql = 'SELECT id, service_id, service_name, service_type, short_code, criteria, service_endpoint, delivery_notification_endpoint, interface_name, correlator, status, created_on, last_updated_on, last_updated_by FROM tbl_services ORDER BY id '.$order.' LIMIT '.$start_index.', '.$limit;
+        $sql = 'SELECT id, service_id, service_name, service_type, short_code, criteria, service_endpoint, delivery_notification_endpoint, interface_name, correlator, status, created_on, last_updated_on, last_updated_by FROM tbl_services WHERE 1 ';
+		$parameters = array();
+		//include service_id filter
+		if (isset($service_id) && !empty($service_id)) {
+			$sql= $sql." AND service_id=:service_id";
+			$parameters[':service_id']=$service_id;
+		}
+		//include service_type filter
+		if (isset($service_type) && !empty($service_type)) {
+			$sql= $sql." AND service_type=:service_type";
+			$parameters[':service_type']=$service_type;
+		}
+		//include short_code filter
+		if (isset($short_code) && !empty($short_code)) {
+			$sql= $sql." AND short_code=:short_code";
+			$parameters[':short_code']=$short_code;
+		}
+		$query_total = $sql; // copy query to be used to get the total number of reords (without the group by and limit clause)
+		$sql= $sql.' ORDER BY id '.$order.' LIMIT '.$start_index.', '.$limit;
+		
+
 		
 		// add some logic to handle exceptions in this script
 		$row_count=0; 
+		$total_records=0;
 		$services='';
 		$database=null;
 		try {
@@ -565,24 +619,44 @@ class ServiceModel extends Model
 			return  array('result' => 3, 'resultDesc' => 'Cannot connect to the database. Error: '.$ex->getMessage()); 
 		}
 		
-		try {	
-			$query = $database->prepare($sql);	
-			if ($query->execute()) {
-				// fetchAll() is the PDO method that gets all result rows
-		        $services = $query->fetchAll();
-				$row_count = $query->rowCount();
-				
-				if ($row_count > 0)  {	
-					return array('result'=>0, 'resultDesc'=>'Records retrieved successfully.', '_recordsRetrieved' => $row_count, 'services'=>$services );
-				}
+		try {
+			//get total records for pagination
+			$query = $database->prepare($query_total);	
+			if ($query->execute($parameters)) {
+				$total_records = $query->rowCount();
 			} else {	
 				$this->logger->error(
-					'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}',
+					'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}|bind_parameters:{bind_params}',
 					array(
 						'class_mame'=>__CLASS__,
 						'method_name'=>__FUNCTION__,
 						'error'=>$database->errorCode(),
-						'query'=>$sql
+						'query'=>$sql,
+						'bind_params'=>json_encode($parameters)
+					)
+				);
+				return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 
+			}
+			
+			//get records
+			$query = $database->prepare($sql);	
+			if ($query->execute($parameters)) {
+				// fetchAll() is the PDO method that gets all result rows
+		        $services = $query->fetchAll();
+				$row_count = $query->rowCount();
+				
+				if ($row_count >= 0)  {	
+					return array('result'=>0, 'resultDesc'=>'Records retrieved successfully.', '_recordsRetrieved' => $row_count, '_totalRecords' => $total_records, 'services'=>$services );
+				}
+			} else {	
+				$this->logger->error(
+					'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|query:{query}|bind_params:{bind_params}',
+					array(
+						'class_mame'=>__CLASS__,
+						'method_name'=>__FUNCTION__,
+						'error'=>$database->errorCode(),
+						'query'=>$sql,
+						'bind_params'=>json_encode($parameters)
 					)
 				);
 				return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 
@@ -600,6 +674,6 @@ class ServiceModel extends Model
 			return  array('result' => 4, 'resultDesc' => 'Error executing a query. Error: '.$e->getMessage()); 
 		}
 		
-		return array('result'=>1, 'resultDesc'=>'No records found - '.$errorCode, 'services'=>$services);
+		return array('result'=>1, 'resultDesc'=>'No records found', 'services'=>$services);
 	} 
 }

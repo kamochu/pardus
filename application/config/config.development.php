@@ -9,15 +9,30 @@
  * Configuration for: Error reporting
  * Useful to show every little problem during development, but only show hard / no errors in production.
  * It's a little bit dirty to put this here, but who cares. For development purposes it's totally okay.
+ * 
+ * ini_set does only work if that code is executed. Not useful for code that has parse errors because the 
+ * error will be before the code is executed. Instead write those changes into the php.ini.
  */
+// Report all errors
 error_reporting(E_ALL);
-ini_set("display_errors", 1);
+// DO NOT display errors on front end 
+ini_set("display_errors", 0); 
+// log the errors 
+ini_set("log_errors", 1); 
+//redirect the errors to a log file
+ini_set("error_log", realpath(dirname(__FILE__).'/../../') . '/logs/php_error_'.date('Ymd').'.log'); 
 
 /**
  * Returns the full configuration.
  * This is used by the core/Config class.
  */
 return array(
+	/**
+	 * System version configuration
+	 *
+	 */
+	 'VERSION' => 'SSG_v1.0.3',
+	 'COPYRIGHT' => '&copy; '.date('Y').' SSG. All rights reserved.',
 	/**
 	 * Configuration for: Base URL
 	 * This detects your URL/IP incl. sub-folder automatically. You can also deactivate auto-detection and provide the
@@ -28,9 +43,9 @@ return array(
 	 * Configuration for: Folders
 	 * Usually there's no reason to change this.
 	 */
-	'PATH_CLASS' => realpath(dirname(__FILE__).'/../../') . '/Application/Core/',
-	'PATH_CONTROLLER' => realpath(dirname(__FILE__).'/../../') . '/Application/Controller/',
-	'PATH_VIEW' => realpath(dirname(__FILE__).'/../../') . '/Application/View/',
+	'PATH_CLASS' => realpath(dirname(__FILE__).'/../../') . '/application/Core/',
+	'PATH_CONTROLLER' => realpath(dirname(__FILE__).'/../../') . '/application/Controller/',
+	'PATH_VIEW' => realpath(dirname(__FILE__).'/../../') . '/application/View/',
 	//dirname(__FILE__).'/../../vendor/log4php/Logger.php';
 	/**
 	 * Configuration for: logger interface
@@ -134,6 +149,12 @@ return array(
 	'EMAIL_VERIFICATION_FROM_NAME' => 'My Project',
 	'EMAIL_VERIFICATION_SUBJECT' => 'Account activation for PROJECT XY',
 	'EMAIL_VERIFICATION_CONTENT' => 'Please click on this link to activate your account: ',
+	/**
+	 * Table display data
+	 */
+	'RECORDS_PER_PAGE' => '7',
+	'CRUMBS' => '20',
+	/**
 	/**
 	 * Configuration for: SP SDP data
 	 */

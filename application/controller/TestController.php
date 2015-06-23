@@ -2,6 +2,7 @@
 namespace Ssg\Controller;
 
 use Ssg\Core\Controller;
+use Ssg\Core\Pagination;
 use Ssg\Model\MessageModel;
 use Ssg\Model\ServiceModel;
 use Psr\Log\LoggerInterface;
@@ -21,6 +22,18 @@ class TestController extends Controller
      */
 	 public function index()
 	 {
+		 //test pagination class 
+		 $page = isset($_GET['page']) ? ((int) $_GET['page']) : 1;
+		 
+		// instantiate; set current page; set number of records
+		$pagination = (new Pagination());
+		$pagination->setCurrent($page);
+		$pagination->setTotal(200);
+		
+		$markup = $pagination->parse();
+		
+		echo $markup."\n\n\n";
+		 
 		echo "\n\n\nGET ALL SERVICES:\n\n";
 		$service_model= new ServiceModel($this->logger);
 		print_r($service_model->getServices());
@@ -72,6 +85,5 @@ class TestController extends Controller
 		
 		//render the view and pass the raw post data
         $this->View->renderWithoutHeaderAndFooter('test/index',array('test'=>'This is a test page.'));
-
 	 }	
 }

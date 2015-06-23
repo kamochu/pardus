@@ -37,23 +37,24 @@ class Application
 		$logger = new PardusLogger($this->logger_name);
 		
 		// instantiate the constructor object
-		$this->controller = new $this->controller_name($logger);	
-
-		// check for method: does such a method exist in the controller ?
-		if (method_exists($this->controller, $this->action_name)) {
-			if (!empty($this->parameters)) {
-				// call the method and pass arguments to it
-				call_user_func_array(array($this->controller, $this->action_name), $this->parameters);
+		if (class_exists( $this->controller_name)) {
+			$this->controller = new $this->controller_name($logger);	
+	
+			// check for method: does such a method exist in the controller ?
+			if (method_exists($this->controller, $this->action_name)) {
+				if (!empty($this->parameters)) {
+					// call the method and pass arguments to it
+					call_user_func_array(array($this->controller, $this->action_name), $this->parameters);
+				} else {
+					// if no parameters are given, just call the method without parameters, like $this->index->index();
+					$this->controller->{$this->action_name}();
+				}
 			} else {
-				// if no parameters are given, just call the method without parameters, like $this->index->index();
-				$this->controller->{$this->action_name}();
+				header('location: ' . Config::get('URL') . 'error');
 			}
 		} else {
 			header('location: ' . Config::get('URL') . 'error');
 		}
-			
-			
-      
     }
 
     /**

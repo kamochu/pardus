@@ -49,6 +49,7 @@ class SendController extends Controller
 		$data['sender_address'] = Request::get('sender_address',true);
 		$data['correlator'] = Request::get('correlator',true);
 		$data['message'] = Request::get('message',true);
+		$data['batch_id'] = Request::get('batch_id',true);
 		
 		$this->logger->debug(
 			'{class_mame}|{method_name}|send-sms-request|{parameters}',
