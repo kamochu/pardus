@@ -21,6 +21,9 @@ class ReportsController extends Controller
 		
 		// this entire controller should only be visible/usable by logged in users, so we put authentication-check here
 		Auth::checkAuthentication();
+		
+		//check the IP whitelist
+		Auth::checkIPAuthentication();
     }
 	
     /**
