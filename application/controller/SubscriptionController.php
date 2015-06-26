@@ -14,6 +14,9 @@ class SubscriptionController extends Controller
     public function __construct(LoggerInterface $logger = null)
     {
         parent::__construct($logger);
+		
+		//check the IP whitelist
+		Auth::checkIPAuthentication();
     }
 	
 	

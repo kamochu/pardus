@@ -8,6 +8,7 @@ use Ssg\Core\Session;
 use Ssg\Core\Auth;
 use Ssg\Model\LoginModel;
 use Ssg\Model\UserModel;
+use Ssg\Model\PasswordResetModel;
 
 /**
  * LoginController
@@ -23,6 +24,9 @@ class LoginController extends Controller
     public function __construct()
     {
         parent::__construct();
+		
+		//check the IP whitelist
+		Auth::checkIPAuthentication();
     }
 
     /**
@@ -139,14 +143,15 @@ class LoginController extends Controller
      * @param string $user_name username
      * @param string $verification_code password reset verification token
      */
-    public function verifyPasswordReset($user_name, $verification_code)
+    public function changePassword()
     {
+		
         // check if this the provided verification code fits the user's verification code
-        if (PasswordResetModel::verifyPasswordReset($user_name, $verification_code)) {
+        if (Session::userIsLoggedIn()) {
+			$user_name = Session::get('user_name');
             // pass URL-provided variable to view to display them
-            $this->View->render('login/changePassword', array(
+            $this->View->render('login/change_password', array(
                 'user_name' => $user_name,
-                'user_password_reset_hash' => $verification_code
             ));
         } else {
             Redirect::to('login/index');
@@ -163,11 +168,19 @@ class LoginController extends Controller
      */
     public function setNewPassword()
     {
-        PasswordResetModel::setNewPassword(
-            Request::post('user_name'), Request::post('user_password_reset_hash'),
-            Request::post('user_password_new'), Request::post('user_password_repeat')
-        );
-        Redirect::to('login/index');
+		
+		if (Session::userIsLoggedIn()) {
+            PasswordResetModel::setNewPassword(
+				Request::post('user_name'), Request::post('user_password_reset_hash'),
+				Request::post('user_password_new'), Request::post('user_password_repeat')
+			);
+			$user_name = Session::get('user_name');
+			$this->View->render('login/set_new_password', array(
+                'user_name' => $user_name,
+            ));
+        } else {
+            Redirect::to('login/index');
+        }
     }
 
     /**

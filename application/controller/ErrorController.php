@@ -32,7 +32,7 @@ class ErrorController extends Controller
 	public function httperror400()
 	{
 		 header('HTTP/1.0 400 Bad Request');
-		 $this->View->renderWithoutHeaderAndFooter('error/processing',array("error"=>"Bad Request - invalid request"));
+		 $this->View->renderWithoutHeaderAndFooter('error/httperror400',array("error"=>"Bad Request - invalid request"));
 	}
 	
 	/**
@@ -41,6 +41,15 @@ class ErrorController extends Controller
 	public function httperror500()
 	{
 		 header('HTTP/1.0 500 Internal Server Error');
-		 $this->View->renderWithoutHeaderAndFooter('error/processing',array("error"=>"Error processing the request"));
+		 $this->View->renderWithoutHeaderAndFooter('error/httperror500',array("error"=>"Error processing the request"));
+	}
+	
+	/**
+     * Forbidden page 
+     */
+	public function httperror401()
+	{
+		 header('HTTP/1.0 401 Unauthorized');
+		 $this->View->renderWithoutHeaderAndFooter('error/httperror',array("error"=>"HTTP Error 401 Unauthorized"));
 	}
 }

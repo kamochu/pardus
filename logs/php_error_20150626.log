@@ -1,0 +1,17 @@
+[26-Jun-2015 16:32:23 Africa/Nairobi] PHP Warning:  PDOStatement::execute(): SQLSTATE[42S02]: Base table or view not found: 1146 La table 'sematel_ssg.users' n'existe pas in C:\wamp\www\ssg\application\Model\PasswordResetModel.php on line 171
+[26-Jun-2015 16:32:23 Africa/Nairobi] PHP Stack trace:
+[26-Jun-2015 16:32:23 Africa/Nairobi] PHP   1. {main}() C:\wamp\www\ssg\public\index.php:0
+[26-Jun-2015 16:32:23 Africa/Nairobi] PHP   2. Ssg\Core\Application->__construct() C:\wamp\www\ssg\public\index.php:18
+[26-Jun-2015 16:32:23 Africa/Nairobi] PHP   3. Ssg\Controller\LoginController->setNewPassword() C:\wamp\www\ssg\application\Core\Application.php:50
+[26-Jun-2015 16:32:23 Africa/Nairobi] PHP   4. Ssg\Model\PasswordResetModel::setNewPassword() C:\wamp\www\ssg\application\Controller\LoginController.php:176
+[26-Jun-2015 16:32:23 Africa/Nairobi] PHP   5. Ssg\Model\PasswordResetModel::saveNewUserPassword() C:\wamp\www\ssg\application\Model\PasswordResetModel.php:197
+[26-Jun-2015 16:32:23 Africa/Nairobi] PHP   6. PDOStatement->execute() C:\wamp\www\ssg\application\Model\PasswordResetModel.php:171
+[26-Jun-2015 16:40:03 Africa/Nairobi] PHP Fatal error:  Uncaught exception 'PDOException' with message 'There is no active transaction' in C:\wamp\www\ssg\application\Model\PasswordResetModel.php:173
+Stack trace:
+#0 C:\wamp\www\ssg\application\Model\PasswordResetModel.php(173): PDO->commit()
+#1 C:\wamp\www\ssg\application\Model\PasswordResetModel.php(199): Ssg\Model\PasswordResetModel::saveNewUserPassword('admin', '$2y$10$n51Dp2gf...', NULL)
+#2 C:\wamp\www\ssg\application\Controller\LoginController.php(176): Ssg\Model\PasswordResetModel::setNewPassword('admin', NULL, 'Letmein09!', 'Letmein09!')
+#3 C:\wamp\www\ssg\application\Core\Application.php(50): Ssg\Controller\LoginController->setNewPassword()
+#4 C:\wamp\www\ssg\public\index.php(18): Ssg\Core\Application->__construct()
+#5 {main}
+  thrown in C:\wamp\www\ssg\application\Model\PasswordResetModel.php on line 173

@@ -31,8 +31,19 @@ return array(
 	 * System version configuration
 	 *
 	 */
+	 'APP_NAME' => 'SSG Admin Portal',
 	 'VERSION' => 'SSG_v1.0.3',
 	 'COPYRIGHT' => '&copy; '.date('Y').' SSG. All rights reserved.',
+	 /**
+	  * The IP address allowed to access the solution
+	  * Add a new line for every IP that you ant to allow
+	  */
+	 'ALLOWED_IPS' => array(
+	 	'localhost', // local access
+	 	'127.0.0.1', // local access
+		'196.201.216.13', // production SDP
+		'196.201.216.14', // production SDP
+	 ),
 	/**
 	 * Configuration for: Base URL
 	 * This detects your URL/IP incl. sub-folder automatically. You can also deactivate auto-detection and provide the

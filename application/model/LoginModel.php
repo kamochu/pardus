@@ -6,7 +6,6 @@ use Ssg\Core\Model;
 use Ssg\Core\Config;
 use Ssg\Core\Text;
 use Ssg\Core\Session;
-
 /**
  * LoginModel
  *
