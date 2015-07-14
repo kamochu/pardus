@@ -64,39 +64,39 @@
     </appender>
 	
     <logger name="delivery">
-        <level value="info" />
+        <level value="debug" />
         <appender_ref ref="delivery" />
     </logger>
     <logger name="notify">
-		<level value="info" />
+		<level value="debug" />
         <appender_ref ref="notify" />
     </logger>
 	<logger name="send">
-		<level value="info" />
+		<level value="debug" />
         <appender_ref ref="send" />
     </logger>
 	<logger name="service">
-		<level value="info" />
+		<level value="debug" />
         <appender_ref ref="service" />
     </logger>
 	<logger name="subscription">
-		<level value="info" />
+		<level value="debug" />
         <appender_ref ref="subscription" />
     </logger>
 	<logger name="test">
-		<level value="info" />
+		<level value="debug" />
         <appender_ref ref="test" />
     </logger>
 	<logger name="messages">
-		<level value="info" />
+		<level value="debug" />
         <appender_ref ref="messages" />
     </logger>
 	<logger name="reports">
-		<level value="info" />
+		<level value="debug" />
         <appender_ref ref="reports" />
     </logger>
 	<logger name="default">
-		<level value="info" />
+		<level value="debug" />
         <appender_ref ref="default" />
     </logger>
 </log4php:configuration>

@@ -567,7 +567,7 @@ class ServiceModel extends Model
 			return  array('result' => 4, 'resultDesc' => 'Error executing a query. Error: '.$e->getMessage()); 
 		}
 		
-		return array('result'=>1, 'resultDesc'=>'No record deleted - '.$errorCode, 'service'=>$query_result['service']);
+		return array('result'=>1, 'resultDesc'=>'No record deleted - '.$errorCode, 'service'=>new stdClass());
 	} 
 	
 	

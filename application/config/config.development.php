@@ -93,6 +93,19 @@ return array(
 	'DB_PORT' => '3306',
 	'DB_CHARSET' => 'utf8',
 	/**
+	 * Forwarder Configurations Connection Details
+	 *
+	 */
+	'SQLSRV_DB_TYPE' => 'sqlsrv',
+	'SQLSRV_DB_HOST' => 'SEMATEL-SERVER',
+	'SQLSRV_DB_NAME' => 'db_Sematel',
+	'SQLSRV_DB_USER' => 'sa',
+	'SQLSRV_DB_PASS' => 'SematelServer2014',
+	'INBOX_FORWARDER' => 0, // 0 = OFF, 1 = ON
+	'OUTBOX_FORWARDER' => 0, // 0 = OFF, 1 = ON
+	'DELIVERY_FORWARDER' => 0, // 0 = OFF, 1 = ON 
+	'SUBSCRIPTION_FORWARDER' => 1, // 0 = OFF, 1 = ON
+	/**
 	 * Configuration for: Additional login providers: Facebook
 	 * CURRENTLY REMOVED (as Facebook has removed support for the used API version).
 	 * Another, better and up-to-date implementation might come soon.
@@ -165,6 +178,7 @@ return array(
 	 */
 	'RECORDS_PER_PAGE' => '7',
 	'CRUMBS' => '20',
+	'MAX_RECORDS_PDF' => '500',
 	/**
 	/**
 	 * Configuration for: SP SDP data

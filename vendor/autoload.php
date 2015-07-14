@@ -18,6 +18,8 @@ $loader->register();
 //add the Psr namespace
 $loader->addNamespace('Psr', realpath(dirname(__FILE__)) . '/Psr');
 $loader->addNamespace('Ssg', realpath(dirname(__FILE__).'/../') . '/application');
+$loader->addNamespace('Fpdf', realpath(dirname(__FILE__)). '/Fpdf');
+
 
 
 

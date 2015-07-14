@@ -4,6 +4,7 @@ namespace Ssg\Controller;
 use Ssg\Core\Controller;
 use Ssg\Model\SubscriptionModel;
 use Psr\Log\LoggerInterface;
+use Ssg\Core\Auth;
 
 class SubscriptionController extends Controller
 {

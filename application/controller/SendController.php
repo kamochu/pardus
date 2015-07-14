@@ -5,6 +5,7 @@ use Ssg\Core\Controller;
 use Ssg\Model\SendModel;
 use Ssg\Core\Request;
 use Psr\Log\LoggerInterface;
+use Ssg\Core\Auth;
 
 class SendController extends Controller
 {

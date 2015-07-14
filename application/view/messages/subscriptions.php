@@ -1,3 +1,9 @@
+<?php 
+use Ssg\Core\Config;
+?>
+<span class="pull-right">
+	<a class="btn btn-primary" target="_blank" href="<?php echo Config::get('URL'); ?>messages/subscriptions_pdf/?subscriber_id=<?=$this->subscriber_id?>&service_id=<?=$this->service_id?>&product_id=<?=$this->product_id?>&update_type=<?=$this->update_type?>&start_date=<?=$this->start_date?>&end_date=<?=$this->end_date?>" role="button">Print PDF</a>
+</span>
 <h1>Query Subscription Messages</h1>
 
 <!-- echo out the system feedback (error and success messages) -->
