@@ -67,6 +67,13 @@ class SendController extends Controller
 		//call the sender model to process
 		$model = new SendModel($this->logger);
 		$resultData = $model->process($data);
+		$send_ref_id="";
+		$status="";
+		$status_desc="";
+		
+		if(isset($resultData['data']['send_ref_id'])) $send_ref_id=$resultData['data']['send_ref_id'];
+		if(isset($resultData['data']['status'])) $send_ref_id=$resultData['data']['status'];
+		if(isset($resultData['data']['status_desc'])) $send_ref_id=$resultData['data']['status_desc'];
 		$this->logger->info(
 			'{class_mame}|{method_name}|send-sms-result|{parameters}|{result}|{result_desc}|{send_ref_id}|{send_status}|{send_status_desc}',
 			array(
@@ -75,9 +82,9 @@ class SendController extends Controller
 				'parameters'=>implode('|',$data),
 				'result'=>$resultData['result'],
 				'result_desc'=>$resultData['resultDesc'],
-				'send_ref_id'=>$resultData['data']['send_ref_id'],
-				'send_status'=>$resultData['data']['status'],
-				'send_status_desc'=>$resultData['data']['status_desc']
+				'send_ref_id'=>$send_ref_id,
+				'send_status'=>$status,
+				'send_status_desc'=>$status_desc
 			)
 		);
 		

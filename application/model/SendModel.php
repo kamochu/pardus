@@ -96,24 +96,41 @@ class SendModel extends Model
 			return array('result'=>13, 'resultDesc'=>'Expected parameters not found.',  'data'=>$data);
 		}
 		
+		//get the service data
+		$response  = $this->getService($data['service_id']);
+		//print_r($response);
+		if ($response['result'] != 0) { //retrieving service failed
+			$this->logger->debug(
+				'{class_mame}|{method_name}|error-loading-service|{result}|{result_desc}',
+				array(
+					'class_mame'=>__CLASS__,
+					'method_name'=>__FUNCTION__,
+					'request_data'=>implode('|',$data),
+					'result'=>$response['result'],
+					'sdp_result_desc'=>$response['resultDesc']
+					)
+			);
+			return $response;
+		}
+		
+		//extract service data from 
+		$service = $response['data']; //service data
+		
 		// Check service status configuration 0 - OFF and 1 - ON
-		if(Config::get('SERVICE_STATUS_'.$data['service_id']) != 1)
-		{
+		if ($service->status != 1) {
 			return array('result'=>15, 'resultDesc'=>'Service with id '.$data['service_id'].' is OFF or is not configured correctly.',  'data'=>$data);
 		}
 		
 		//resolve the end point
-		$data['notify_endpoint'] = Config::get('SERVICE_DELIVERY_ENDPOINT_'.$data['service_id']); 
-		if(!isset($data['notify_endpoint']) || empty($data['notify_endpoint']))
-		{
+		$data['notify_endpoint'] = $service->delivery_notification_endpoint; 
+		if (!isset($data['notify_endpoint']) || empty($data['notify_endpoint'])) {
 			//use default enmd point
 			$data['notify_endpoint'] = Config::get('SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_ENDPOINT'); 
 		}
 		
 		//check whether short code exists as part of the request data, if not, load service configuration file
-		if(!isset($data['sender_address']) || empty($data['sender_address']))
-		{
-			$data['sender_address'] = Config::get('SERVICE_CODE_'.$data['service_id']); 
+		if (!isset($data['sender_address']) || empty($data['sender_address'])) {
+			$data['sender_address'] = $service->short_code;
 		}
 		
 		//send request to external server
@@ -133,19 +150,15 @@ class SendModel extends Model
 		$data['sdp_sendsms_result'] = $send_response;
 
 		//check send sms response code
-		if($send_response['ResultCode'] == 0) // success
-		{
+		if ($send_response['ResultCode'] == 0) {// success
 			//send the message to external system 
 			$data['send_ref_id'] =  $send_response['ResultDetails']['result']; //ref id of SDP to be changed with API change
 			$data['status'] = 2; //send sms successful
 			$data['status_desc'] = 'SENT[Message sent]'; //message sent
-		}
-		else
-		{
+		} else {
 			$data['status'] = 4; //sending failed
 			$data['status_desc'] = 'FAIED[Sending failed. '.$send_response['ResultCode'].' - '.$send_response['ResultDesc'].': '.$send_response['ResultDetails'].']'; //message send failed 
 		}
-		
 		return array('result'=>"0", 'resultDesc'=>'Preprocessing successful',  'data'=>$data);
 	}
 	
@@ -253,5 +266,49 @@ class SendModel extends Model
 	protected function hook($data)
 	{
 		return array('result'=>"0", 'resultDesc'=>'Hook execution successful',  'data'=>$data);
+	}
+	
+	
+	private function getService($service_id)
+	{	
+		//get the database connection
+		$database=null;
+		try {
+			$database = DatabaseFactory::getFactory()->getConnection();
+		} catch (Exception $ex) {
+			return  array('result' => 3, 'resultDesc' => 'Cannot connect to the database. Error: '.$ex->getMessage()); 
+		}
+		
+		//prepare and execute the query
+		try {		
+			$sql = "SELECT * FROM tbl_services WHERE service_id = :service_id LIMIT 1";
+			$query = $database->prepare($sql);
+			$bind_parameters = array(':service_id' => $service_id);
+			
+			if ($query->execute($bind_parameters)) {
+				$service = $query->fetch();
+				if ($query->rowCount() < 1) {	
+				   return array('result' => 1, 'resultDesc' => 'Service with id '.$service_id.' not found.', 'service' => new stdClass()); 
+				}else{
+					return array('result' => 0, 'resultDesc' => 'Service found.', 'data' => $service); 
+				}
+			} else {	
+				$this->logger->error(
+					'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}|bind_parameters:{bind_params}',
+					array(
+						'class_mame'=>__CLASS__,
+						'method_name'=>__FUNCTION__,
+						'error'=>$database->errorCode(),
+						'query'=>$sql,
+						'bind_params'=>json_encode($bind_parameters)
+					)
+				);
+				return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 
+			}
+		} catch (PDOException $e) {
+			return  array('result' => 4, 'resultDesc' => 'Error executing a query. Error: '.$e->getMessage()); 
+		}
+		
+        return array('result' => 7, 'resultDesc' => 'Unknown error', 'data' => new stdClass()); 
 	}
 }

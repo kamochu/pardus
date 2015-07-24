@@ -86,5 +86,4 @@ class NotifyController extends Controller
 		 	$this->View->renderWithoutHeaderAndFooter('error/httperror500',array("error"=>$resultData['result']." - ".$resultData['resultDesc']));
 		}
 	 }
-	
 }

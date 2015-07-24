@@ -173,7 +173,13 @@ class SubscriptionModel extends Model
 				if( isset($data['key'.$i])&& isset($data['value'.$i])) $named_parameters_array[$data['key'.$i]]= $data['value'.$i];
 			}
 			$named_parameters = json_encode($named_parameters_array); //encode into json string
-		}	
+		}
+		
+		//add some to pull the keyword - required by the application keyword//{"accessCode":"22348","chargeMode":"0","MDSPSUBEXPMODE":"1","objectType":"1","isAutoExtend":"0","shortCode":"22348","isFreePeriod":"false","payType":"0","transactionID":"404090102571507240446506653008","orderKey":"999000000160020096","isSubscribeCnfmFlow":"true","status":"0","validTime":"20361231210000","keyword":"m47","cycleEndTime":"20150823210000","durationOfGracePeriod":"-1","serviceAvailability":"0","channelID":"143","TraceUniqueID":"404090102571507240446506653009","operCode":"operCode","rentSuccess":"true","try":"false"}
+		
+		$data['keyword'] =''; //initialize the keyword
+		if (isset($named_parameters_array['keyword'])) $data['keyword'] = $named_parameters_array['keyword'];
+		
 		
 		// add some logic to handle exceptions in this script
 		$database=null;
@@ -254,6 +260,7 @@ class SubscriptionModel extends Model
 			$effective_time = "";
 			$expiry_time = "";
 			$named_parameters = "";
+			$keyword = "";
 			
 			//get the data from array
 			if(isset($data['_lastInsertID'])) $id = $data['_lastInsertID'];
@@ -267,6 +274,7 @@ class SubscriptionModel extends Model
 			if(isset($data['updateDesc'])) $update_desc = $data['updateDesc'];
 			if(isset($data['effectiveTime'])) $effective_time = $data['effectiveTime'];
 			if(isset($data['expiryTime'])) $expiry_time = $data['expiryTime'];
+			if(isset($data['keyword'])) $keyword = $data['keyword'];
 		
 			
 			// process named parameters - key value pairs
@@ -292,11 +300,11 @@ class SubscriptionModel extends Model
 			try {		
 				$database->beginTransaction();
 				//$sql=$sql="INSERT INTO dbo.tbl_Subscription_messages (id, subscriber_id, sp_id, product_id, service_id, service_list, update_type, update_desc, effective_time, expiry_time, created_on) VALUES (:id,:subscriber_id,:sp_id,:product_id,:service_id,:service_list,:update_type,:update_desc,:effective_time,:expiry_time,CURRENT_TIMESTAMP)";
-				$sql="INSERT INTO dbo.tbl_Subscription_messages (id, subscriber_id, sp_id, product_id, service_id, service_list, update_type, update_desc, effective_time, expiry_time, created_on) VALUES (:id,:subscriber_id,:sp_id,:product_id,:service_id,:service_list,:update_type,:update_desc,:effective_time,:expiry_time,CURRENT_TIMESTAMP)";;
+				$sql="INSERT INTO dbo.tbl_Subscription_messages (id, subscriber_id, sp_id, product_id, service_id, service_list, update_type, update_desc, effective_time, expiry_time, created_on, keyword) VALUES (:id,:subscriber_id,:sp_id,:product_id,:service_id,:service_list,:update_type,:update_desc,:effective_time,:expiry_time,CURRENT_TIMESTAMP,:keyword)";;
 				
 				$query = $database->prepare($sql);
 	
-				$bind_patameters = array(':id' => $id, ':subscriber_id' => $subscriber_id , ':sp_id' => $sp_id, ':product_id' => $product_id, ':service_id' => $service_id, ':service_list' => $service_list, ':update_type' => $update_type, ':update_desc' => $update_desc, ':effective_time' => $effective_time,  ':expiry_time' => $expiry_time);
+				$bind_patameters = array(':id' => $id, ':subscriber_id' => $subscriber_id , ':sp_id' => $sp_id, ':product_id' => $product_id, ':service_id' => $service_id, ':service_list' => $service_list, ':update_type' => $update_type, ':update_desc' => $update_desc, ':effective_time' => $effective_time,  ':expiry_time' => $expiry_time, ':keyword'=>$keyword);
 				
 				$this->logger->debug(
 						'{class_mame}|{method_name}|{service_id}|forwarding-hook|{query}|bind_parameters:{bind_params}',

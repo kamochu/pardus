@@ -21,6 +21,7 @@ use \Ssg\Core\Session;
     <!-- Custom styles for this template -->
     <link href="<?php echo Config::get('URL'); ?>css/custom.css" rel="stylesheet">
     <link href="<?php echo Config::get('URL'); ?>css/pagination.css" rel="stylesheet">
+    <link href="<?php echo Config::get('URL'); ?>js/jtable/themes/redmond/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css" />
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="<?php echo Config::get('URL'); ?>assets/js/ie8-responsive-file-warning.js"></script><![endif]-->

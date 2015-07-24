@@ -32,7 +32,7 @@ return array(
 	 *
 	 */
 	 'APP_NAME' => 'SSG Admin Portal',
-	 'VERSION' => 'SSG_v1.0.3',
+	 'VERSION' => 'SSG_v1.0.4',
 	 'COPYRIGHT' => '&copy; '.date('Y').' SSG. All rights reserved.',
 	 /**
 	  * The IP address allowed to access the solution
@@ -104,7 +104,7 @@ return array(
 	'INBOX_FORWARDER' => 0, // 0 = OFF, 1 = ON
 	'OUTBOX_FORWARDER' => 0, // 0 = OFF, 1 = ON
 	'DELIVERY_FORWARDER' => 0, // 0 = OFF, 1 = ON 
-	'SUBSCRIPTION_FORWARDER' => 1, // 0 = OFF, 1 = ON
+	'SUBSCRIPTION_FORWARDER' => 0, // 0 = OFF, 1 = ON
 	/**
 	 * Configuration for: Additional login providers: Facebook
 	 * CURRENTLY REMOVED (as Facebook has removed support for the used API version).
@@ -207,25 +207,4 @@ return array(
 	'SMS_ON_DEMAND_SERVICE_TYPE' => 1,
 	'SMS_SERVICE_ON' => 1,
 	'SMS_SERVICE_OFF' => 0,
-	/**
-	 * Configuration for: Service Configurations - This should be sychroznized with the database parameters
-	 */
-	 //bulk service
-	'SERVICE_STATUS_6013202000002998' => 1,
-	'SERVICE_CODE_6013202000002998' => '901',
-	'SERVICE_DELIVERY_ENDPOINT_6013202000002998' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
-	'SERVICE_STATUS_6013202000002998' => 1,
-	//new service (this comment is not on masika's code)
-	'SERVICE_STATUS_6015512000111462' => 1,
-	'SERVICE_CODE_6015512000111462' => '901',
-	'SERVICE_DELIVERY_ENDPOINT_6015512000111462' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
-	'SERVICE_STATUS_6015512000111462' => 1,
-	//on demand service
-	'SERVICE_CODE_6013202000002997' => '901',
-	'SERVICE_DELIVERY_ENDPOINT_6013202000002997' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
-	'SERVICE_STATUS_6013202000002997' => 1,
-	//subscription service
-	'SERVICE_CODE_6013202000002995' => '901',
-	'SERVICE_DELIVERY_ENDPOINT_6013202000002995' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
-	'SERVICE_STATUS_6013202000002995' => 1,
 );

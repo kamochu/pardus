@@ -58,9 +58,7 @@ class ServiceModel extends Model
 			} else {
 				return $response; // return as is
 			}
-		}
-		else
-		{
+		} else {
 			$service_data->status = Config::get('SMS_SERVICE_ON'); // activate
 		}
 		

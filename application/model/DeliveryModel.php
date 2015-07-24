@@ -4,7 +4,9 @@ namespace Ssg\Model;
 use Ssg\Core\DatabaseFactory;
 use Ssg\Core\PardusXMLParser;
 use Ssg\Core\Model;
+use Ssg\Core\Config;
 use Psr\Log\LoggerInterface;
+use \PDO;
 
 
 /**
@@ -236,11 +238,100 @@ class DeliveryModel extends Model
 		$data['_recordsUpdated'] = $row_count;
 		$database->commit();
 		
-		if ($row_count > 0 || $database->errorCode() == "0000")  //success
-		{	
-            return array("result"=>"0", "resultDesc"=>"Saving successful", "data"=>$data);
+		if ($database->errorCode() != "0000") {	 //success
+            return array("result"=>"18", "resultDesc"=>"Saving FAILED. Error: ".$database->errorCode(), "data"=>$data);
         }
 		
-		return array("result"=>"16", "resultDesc"=>"Hook execution failed", "data"=>$data);
+		//forward the request
+		if (Config::get('DELIVERY_FORWARDER') == 1) { //
+		
+			//initialize the parameters
+			$time_stamp ="";
+			$sub_req_id = "";
+			$trace_unique_id = "";
+			$correlator = "";
+			$dest_address = "";
+			$delivery_status = "";
+			$id = "";
+			
+			//get the data from array
+			if(isset($data['timeStamp'])) $time_stamp = $data['timeStamp'];
+			if(isset($data['subReqID'])) $sub_req_id = $data['subReqID'];
+			if(isset($data['traceUniqueID'])) $trace_unique_id = $data['traceUniqueID'];
+			if(isset($data['correlator'])) $correlator = $data['correlator'];
+			if(isset($data['address'])) $dest_address = $data['address'];
+			if(isset($data['deliveryStatus'])) $delivery_status = $data['deliveryStatus'];
+			if(isset($data['_lastInsertID'])) $id = $data['_lastInsertID'];
+			
+			// add some logic to handle exceptions in this script
+			$database=null;
+			try {
+				//$database = SQLSRVDatabaseFactory::getFactory()->getConnection();
+				$options = array(PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ, PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING);
+				$database = new PDO('sqlsrv:Server=SEMATEL-SERVER;Database=db_Sematel','sa', 'SematelServer2014', $options);
+			} catch (Exception $ex) {
+				return  array('result' => 3, 'resultDesc' => 'Cannot connect to the database. Error: '.$ex->getMessage()); 
+			}
+			
+			$bind_patameters =array();
+			
+			try {		
+				$database->beginTransaction();
+				
+				$sql="INSERT INTO dbo.tbl_delivery_receipts (id, time_stamp, sub_req_id, trace_unique_id, correlator, dest_address, delivery_status, created_on) VALUES (:id, :time_stamp, :sub_req_id, :trace_unique_id, :correlator, :dest_address, :delivery_status, CURRENT_TIMESTAMP);";
+				$query = $database->prepare($sql);
+				
+				$bind_patameters=array(':id'=>$id, ':time_stamp' => $time_stamp , ':sub_req_id' => $sub_req_id, ':trace_unique_id' => $trace_unique_id, ':correlator' => $correlator,':dest_address' => $dest_address, ':delivery_status' => $delivery_status);
+				
+				$this->logger->debug(
+						'{class_mame}|{method_name}|{service_id}|forwarding-hook|{query}|bind_parameters:{bind_params}',
+						array(
+							'class_mame'=>__CLASS__,
+							'method_name'=>__FUNCTION__,
+							'query'=>$sql,
+							'bind_params'=>json_encode($bind_patameters)
+						)
+					);
+				
+				if ($query->execute($bind_patameters)) {
+					$row_count = $query->rowCount();
+					$database->commit();
+					
+					if ($row_count == 1) {	
+						return array('result'=>0, 'resultDesc'=>'Forwarding successful', 'data'=>$data);
+					}
+				} else {	
+					$this->logger->error(
+						'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}|bind_parameters:{bind_params}',
+						array(
+							'class_mame'=>__CLASS__,
+							'method_name'=>__FUNCTION__,
+							'error'=>$database->errorCode(),
+							'query'=>$sql,
+							'bind_params'=>json_encode($bind_patameters)
+						)
+					);
+					return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 
+				}
+			} catch (PDOException $e) {
+				
+				$this->logger->error(
+						'{class_mame}|{method_name}|{service_id}|forwarding-hook|{query}|bind_parameters:{bind_params}|{error}',
+						array(
+							'class_mame'=>__CLASS__,
+							'method_name'=>__FUNCTION__,
+							'query'=>$sql,
+							'bind_params'=>json_encode($bind_patameters),
+							'error'=>$e->getMessage()
+						)
+					);
+					
+				return  array('result' => 4, 'resultDesc' => 'Error executing a query. Error: '.$e->getMessage()); 
+			}
+			
+			return array("result"=>"19", "resultDesc"=>"Forwarding record failed ($sql)".$database->errorCode()." ".$database->errorInfo(), "data"=>$data);
+		}
+		
+		return array("result"=>"0", "resultDesc"=>"Hook execution successful", "data"=>$data);
 	}
 }
