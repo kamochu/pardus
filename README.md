@@ -2,7 +2,7 @@
 Pardus (also referred to as Simple SMS Gateway, SSG) is an SMS gateway solution that integrates with Huawei SDP.
  
 # Change Log
-## Version 1.0.4 released on 24-07-2015
+## Version 1.0.4 released on 27-07-2015
 ### New Features
 - Add change password functionality
 - Add IP white listing
@@ -18,6 +18,9 @@ Pardus (also referred to as Simple SMS Gateway, SSG) is an SMS gateway solution 
 - Date picker to be added to the SSG UI portal to improve user experience
 - Added keyword to message subscriptions requests
 
-
 ### Features removed
 - Remove remember functionality
+
+
+### Issues Fixed
+- Subscription response(XML) to SDP was corrected. This was affecting all subscriptions services. 
