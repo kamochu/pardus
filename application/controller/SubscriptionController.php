@@ -77,7 +77,7 @@ class SubscriptionController extends Controller
 		// successful processing
 		if ($resultData['result'] == 0) {
 			//render the view and pass the raw post data
-        	$this->View->renderWithoutHeaderAndFooter('notify/index',$resultData);
+        	$this->View->renderWithoutHeaderAndFooter('subscription/index',$resultData);
 		} else if( $resultData['result'] == 11) {
 			// decoding failure //bad request error
 			header('HTTP/1.0 400 Bad Request');
