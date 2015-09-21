@@ -4,6 +4,7 @@ namespace Ssg\Controller;
 use Ssg\Core\Controller;
 use Ssg\Model\NotifyModel;
 use Psr\Log\LoggerInterface;
+use Ssg\Core\Auth;
 
 class NotifyController extends Controller
 {
@@ -85,5 +86,4 @@ class NotifyController extends Controller
 		 	$this->View->renderWithoutHeaderAndFooter('error/httperror500',array("error"=>$resultData['result']." - ".$resultData['resultDesc']));
 		}
 	 }
-	
 }

@@ -1,4 +1,0 @@
-2015-06-23 11:43:09,758|INFO|service|Ssg\Controller\ServiceController|disable|6013992000001445|disable-service|0|Saving successful
-2015-06-23 11:43:37,033|INFO|service|Ssg\Controller\ServiceController|enable|6013992000001445|result|0|Saving successful
-2015-06-23 11:44:38,122|INFO|service|Ssg\Controller\ServiceController|enable|6013992000001444|result|0|Saving successful
-2015-06-23 11:47:50,633|INFO|service|Ssg\Controller\ServiceController|disable|6013992000001444|disable-service|0|Saving successful

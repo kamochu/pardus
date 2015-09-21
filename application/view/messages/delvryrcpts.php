@@ -1,3 +1,9 @@
+<?php 
+use Ssg\Core\Config;
+?>
+<span class="pull-right">
+	<a class="btn btn-primary" target="_blank" href="<?php echo Config::get('URL'); ?>messages/delvryrcpts_pdf/?dest_address=<?=$this->dest_address?>&correlator=<?=$this->correlator?>&start_date=<?=$this->start_date?>&end_date=<?=$this->end_date?>" role="button">Print PDF</a>
+</span>
 <h1>Query Delivery Receipts</h1>
 
 <!-- echo out the system feedback (error and success messages) -->

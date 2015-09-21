@@ -63,7 +63,7 @@ use \Ssg\Core\Config;
       <input type="text" class="form-control input-sm" name="service_endpoint" id="service_endpoint" placeholder="Service URL" value="<?= $this->service_endpoint ?>">
     </div>
     <div class="col-sm-6">
-      <p>Service URL used by SDP to forward all messages that meet above criteria e.g. <strong>http://41.222.9.250:49200/ssg/notify/sms/</strong></p>
+      <p>Service URL used by SDP to forward all messages that meet above criteria e.g. <strong>http://197.237.13.55:49200/ssg/notify/sms/</strong> For on demand and <strong>http://197.237.13.55:49200/ssg/subscription/request/</strong> for subscriptions</strong></p>
     </div>
   </div>
   <div class="form-group">
@@ -72,7 +72,7 @@ use \Ssg\Core\Config;
       <input type="text" class="form-control input-sm" name="delivery_notification_endpoint" id="delivery_notification_endpoint" placeholder="Delivery Notification URL" value="<?= $this->delivery_notification_endpoint ?>">
     </div>
     <div class="col-sm-6">
-      <p>Delivery Receipt Notification URL used by SDP to delivery receipts e.g. <strong>http://41.222.9.250:49200/ssg/delivery/receipt/</strong> </p>
+      <p>Delivery Receipt Notification URL used by SDP to delivery receipts e.g. <strong>http://197.237.13.55:49200/ssg/delivery/receipt/</strong> </p>
     </div>
   </div>
   <div class="form-group">

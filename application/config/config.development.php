@@ -32,7 +32,7 @@ return array(
 	 *
 	 */
 	 'APP_NAME' => 'SSG Admin Portal',
-	 'VERSION' => 'SSG_v1.0.3',
+	 'VERSION' => 'SSG_v1.0.4',
 	 'COPYRIGHT' => '&copy; '.date('Y').' SSG. All rights reserved.',
 	 /**
 	  * The IP address allowed to access the solution
@@ -92,6 +92,19 @@ return array(
 	'DB_PASS' => 'admin',
 	'DB_PORT' => '3306',
 	'DB_CHARSET' => 'utf8',
+	/**
+	 * Forwarder Configurations Connection Details
+	 *
+	 */
+	'SQLSRV_DB_TYPE' => 'sqlsrv',
+	'SQLSRV_DB_HOST' => 'SEMATEL-SERVER',
+	'SQLSRV_DB_NAME' => 'db_Sematel',
+	'SQLSRV_DB_USER' => 'sa',
+	'SQLSRV_DB_PASS' => 'SematelServer2014',
+	'INBOX_FORWARDER' => 0, // 0 = OFF, 1 = ON
+	'OUTBOX_FORWARDER' => 0, // 0 = OFF, 1 = ON
+	'DELIVERY_FORWARDER' => 0, // 0 = OFF, 1 = ON 
+	'SUBSCRIPTION_FORWARDER' => 0, // 0 = OFF, 1 = ON
 	/**
 	 * Configuration for: Additional login providers: Facebook
 	 * CURRENTLY REMOVED (as Facebook has removed support for the used API version).
@@ -165,6 +178,7 @@ return array(
 	 */
 	'RECORDS_PER_PAGE' => '7',
 	'CRUMBS' => '20',
+	'MAX_RECORDS_PDF' => '500',
 	/**
 	/**
 	 * Configuration for: SP SDP data
@@ -193,25 +207,4 @@ return array(
 	'SMS_ON_DEMAND_SERVICE_TYPE' => 1,
 	'SMS_SERVICE_ON' => 1,
 	'SMS_SERVICE_OFF' => 0,
-	/**
-	 * Configuration for: Service Configurations - This should be sychroznized with the database parameters
-	 */
-	 //bulk service
-	'SERVICE_STATUS_6013202000002998' => 1,
-	'SERVICE_CODE_6013202000002998' => '901',
-	'SERVICE_DELIVERY_ENDPOINT_6013202000002998' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
-	'SERVICE_STATUS_6013202000002998' => 1,
-	//new service (this comment is not on masika's code)
-	'SERVICE_STATUS_6015512000111462' => 1,
-	'SERVICE_CODE_6015512000111462' => '901',
-	'SERVICE_DELIVERY_ENDPOINT_6015512000111462' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
-	'SERVICE_STATUS_6015512000111462' => 1,
-	//on demand service
-	'SERVICE_CODE_6013202000002997' => '901',
-	'SERVICE_DELIVERY_ENDPOINT_6013202000002997' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
-	'SERVICE_STATUS_6013202000002997' => 1,
-	//subscription service
-	'SERVICE_CODE_6013202000002995' => '901',
-	'SERVICE_DELIVERY_ENDPOINT_6013202000002995' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
-	'SERVICE_STATUS_6013202000002995' => 1,
 );

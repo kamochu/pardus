@@ -6,6 +6,9 @@ use Ssg\Core\Pagination;
 use Ssg\Model\MessageModel;
 use Ssg\Model\ServiceModel;
 use Psr\Log\LoggerInterface;
+use Ssg\Core\Auth;
+use Ssg\Core\PDF;
+use Ssg\Core\Session;
 
 class TestController extends Controller
 {
@@ -19,12 +22,104 @@ class TestController extends Controller
 		//check the IP whitelist
 		Auth::checkIPAuthentication();
     }
+	
+	public function pdf()
+	{
+		$title= "This is the report title";
+		$headers = array('Col 1', 'Col 2', 'Col 3', 'Col 4');
+		$sizes = array(40, 40, 40, 158);
+		$max_sizes = array(40, 35, 40, 100);
+		$data =array(
+			array('Row 1', 'Data ', 'Data', 'Sorry your payment is not ready, work hard to be included in the next payment on September 2015. Sematel, Let the music speak!'),
+			array('Row 2', 'Data ', 'Data', 'Sorry your payment is not ready, work hard to be included in the next payment on September 2015. '),
+			array('Row 3', 'Data ', 'Data', 'Data'),
+			array('Row 4', 'Data ', 'Data', 'Data'),
+			array('Row 5', 'Data ', 'Data', 'Data'),
+			array('Row 6', 'Data ', 'Data', 'Data'),
+			array('Row 7', 'Data ', 'Data', 'Data'),
+			array('Row 8', 'Data ', 'Data', 'Data'),
+			array('Row 1', 'Data ', 'Data', 'Data'),
+			array('Row 2', 'Data ', 'Data', 'Data'),
+			array('Row 3', 'Data ', 'Data', 'Data'),
+			array('Row 4', 'Data ', 'Data', 'Data'),
+			array('Row 5', 'Data ', 'Data', 'Data'),
+			array('Row 6', 'Data ', 'Data', 'Data'),
+			array('Row 7', 'Data ', 'Data', 'Data'),
+			array('Row 8', 'Data ', 'Data', 'Data'),
+			array('Row 1', 'Data ', 'Data', 'Data'),
+			array('Row 2', 'Data ', 'Data', 'Data'),
+			array('Row 3', 'Data ', 'Data', 'Data'),
+			array('Row 4', 'Data ', 'Data', 'Data'),
+			array('Row 5', 'Data ', 'Data', 'Data'),
+			array('Row 6', 'Data ', 'Data', 'Data'),
+			array('Row 7', 'Data ', 'Data', 'Data'),
+			array('Row 8', 'Data ', 'Data', 'Data'),
+			array('Row 1', 'Data ', 'Data', 'Data'),
+			array('Row 2', 'Data ', 'Data', 'Data'),
+			array('Row 3', 'Data ', 'Data', 'Data'),
+			array('Row 4', 'Data ', 'Data', 'Data'),
+			array('Row 5', 'Data ', 'Data', 'Data'),
+			array('Row 6', 'Data ', 'Data', 'Data'),
+			array('Row 7', 'Data ', 'Data', 'Data'),
+			array('Row 8', 'Data ', 'Data', 'Data'),
+			array('Row 1', 'Data ', 'Data', 'Data'),
+			array('Row 2', 'Data ', 'Data', 'Data'),
+			array('Row 3', 'Data ', 'Data', 'Data'),
+			array('Row 4', 'Data ', 'Data', 'Data'),
+			array('Row 5', 'Data ', 'Data', 'Data'),
+			array('Row 6', 'Data ', 'Data', 'Data'),
+			array('Row 7', 'Data ', 'Data', 'Data'),
+			array('Row 8', 'Data ', 'Data', 'Data'),
+			array('Row 1', 'Data ', 'Data', 'Data'),
+			array('Row 2', 'Data ', 'Data', 'Data'),
+			array('Row 3', 'Data ', 'Data', 'Data'),
+			array('Row 4', 'Data ', 'Data', 'Data'),
+			array('Row 5', 'Data ', 'Data', 'Data'),
+			array('Row 6', 'Data ', 'Data', 'Data'),
+			array('Row 7', 'Data ', 'Data', 'Data'),
+			array('Row 8', 'Data ', 'Data', 'Data'),
+			array('Row 1', 'Data ', 'Data', 'Data'),
+			array('Row 2', 'Data ', 'Data', 'Data'),
+			array('Row 3', 'Data ', 'Data', 'Data'),
+			array('Row 4', 'Data ', 'Data', 'Data'),
+			array('Row 5', 'Data ', 'Data', 'Data'),
+			array('Row 6', 'Data ', 'Data', 'Data'),
+			array('Row 7', 'Data ', 'Data', 'Data'),
+			array('Row 8', 'Data ', 'Data', 'Data'),
+			array('Row 1', 'Data ', 'Data', 'Data'),
+			array('Row 2', 'Data ', 'Data', 'Data'),
+			array('Row 3', 'Data ', 'Data', 'Data'),
+			array('Row 4', 'Data ', 'Data', 'Data'),
+			array('Row 5', 'Data ', 'Data', 'Data'),
+			array('Row 6', 'Data ', 'Data', 'Data'),
+			array('Row 7', 'Data ', 'Data', 'Data'),
+			array('Row 8', 'Data ', 'Data', 'Data'),
+			array('Row 1', 'Data ', 'Data', 'Data'),
+			array('Row 2', 'Data ', 'Data', 'Data'),
+			array('Row 3', 'Data ', 'Data', 'Data'),
+			array('Row 4', 'Data ', 'Data', 'Data'),
+			array('Row 5', 'Data ', 'Data', 'Data'),
+			array('Row 6', 'Data ', 'Data', 'Data'),
+			array('Row 7', 'Data ', 'Data', 'Data'),
+			array('Row 8', 'Data ', 'Data', 'Data'),
+			array('Row 8', 'Data ', 'Data', 'Data')
+		);
+		$pdf = new PDF($title, $data, $headers, $sizes, $max_sizes);
+		$pdf->Output();
+	}
 	 
 	 /**
      * Handles what happens when user moves to URL/test/index
      */
 	 public function index()
 	 {
+		 
+		 //test FPDF
+		 
+		 $pdf = new FPDF();
+		 
+		 
+		 
 		 //test pagination class 
 		 $page = isset($_GET['page']) ? ((int) $_GET['page']) : 1;
 		 
@@ -89,4 +184,6 @@ class TestController extends Controller
 		//render the view and pass the raw post data
         $this->View->renderWithoutHeaderAndFooter('test/index',array('test'=>'This is a test page.'));
 	 }	
+	 
+	 
 }

@@ -4,7 +4,9 @@ namespace Ssg\Model;
 use Ssg\Core\PardusXMLParser;
 use Ssg\Core\DatabaseFactory;
 use Ssg\Core\Model;
+use Ssg\Core\Config;
 use Psr\Log\LoggerInterface;
+use \PDO;
 
 /**
  * NotifyModel
@@ -223,19 +225,90 @@ class NotifyModel extends Model
      */
 	protected function hook($data)
 	{
-		/*$url = 'http://192.168.4.14:40000';
-		// use key 'http' even if you send the request to https://...
-		$options = array(
-			'http' => array(
-				'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-				'method'  => 'POST',
-				'content' => http_build_query($data),
-			),
-		);
-		$context  = stream_context_create($options);
-		$result = file_get_contents($url, false, $context);
-		var_dump($result);*/
+		if (Config::get('INBOX_FORWARDER') == 1) { //forward
+			//initialize the parameters
+			$message_id ="";
+			$sp_rev_id ="";
+			$sp_re_password = "";
+			$sp_id = "";
+			$service_id = "";
+			$link_id = "";
+			$trace_unique_id = "";
+			$correlator = "";
+			$message = "";
+			$sender_address = "";
+			$dest_address = "";
+			$date_time = "";
+			
+			//get the data from array
+			if(isset($data['_lastInsertID'])) $message_id = $data['_lastInsertID'];
+			if(isset($data['spRevId'])) $sp_rev_id = $data['spRevId'];
+			if(isset($data['spRevpassword'])) $sp_re_password = $data['spRevpassword'];
+			if(isset($data['spId'])) $sp_id = $data['spId'];
+			if(isset($data['serviceId'])) $service_id = $data['serviceId'];
+			if(isset($data['linkid'])) $link_id = $data['linkid'];
+			if(isset($data['traceUniqueID'])) $trace_unique_id = $data['traceUniqueID'];
+			if(isset($data['correlator'])) $correlator = $data['correlator'];
+			if(isset($data['message'])) $message = $data['message'];
+			if(isset($data['senderAddress'])) $sender_address = $data['senderAddress'];
+			if(isset($data['smsServiceActivationNumber'])) $dest_address = $data['smsServiceActivationNumber'];
+			if(isset($data['dateTime'])) $date_time = $data['dateTime'];
+			
+			// add some logic to handle exceptions in this script
+			$database=null;
+			try {
+				//$database = SQLSRVDatabaseFactory::getFactory()->getConnection();
+				$options = array(PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ, PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING);
+				$database = new PDO('sqlsrv:Server=SEMATEL-SERVER;Database=db_Sematel','sa', 'SematelServer2014', $options);
+			} catch (Exception $ex) {
+				return  array('result' => 3, 'resultDesc' => 'Cannot connect to the database. Error: '.$ex->getMessage()); 
+			}
+			
+			try {		
+				$database->beginTransaction();
+				$sql="INSERT INTO tbl_inbound_messages (message_id, service_id, link_id, trace_unique_id, correlator, message, sender_address, dest_address, date_time, created_on) VALUES (:message_id, :service_id, :link_id, :trace_unique_id, :correlator, :message, :sender_address, :dest_address, :date_time, CURRENT_TIMESTAMP);";
+				
+				$query = $database->prepare($sql);
 	
+				$bind_patameters = array(':message_id'=>$message_id, ':service_id' => $service_id , ':link_id' => $link_id, ':trace_unique_id' => $trace_unique_id, ':correlator' => $correlator, ':message' => $message, ':sender_address' => $sender_address, ':dest_address' => $dest_address, ':date_time' => $date_time);
+				
+				$this->logger->debug(
+						'{class_mame}|{method_name}|{service_id}|forwarding-hook|{query}|bind_parameters:{bind_params}',
+						array(
+							'class_mame'=>__CLASS__,
+							'method_name'=>__FUNCTION__,
+							'query'=>$sql,
+							'bind_params'=>json_encode($bind_patameters)
+						)
+					);
+				
+				if ($query->execute($bind_patameters)) {
+					$row_count = $query->rowCount();
+					$database->commit();
+					
+					if ($row_count == 1) {	
+						return array('result'=>0, 'resultDesc'=>'Forwarding successful', 'data'=>$data);
+					}
+				} else {	
+					$this->logger->error(
+						'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}|bind_parameters:{bind_params}',
+						array(
+							'class_mame'=>__CLASS__,
+							'method_name'=>__FUNCTION__,
+							'error'=>$database->errorCode(),
+							'query'=>$sql,
+							'bind_params'=>json_encode($bind_patameters)
+						)
+					);
+					return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 
+				}
+			} catch (PDOException $e) {
+				return  array('result' => 4, 'resultDesc' => 'Error executing a query. Error: '.$e->getMessage()); 
+			}
+			
+			return array("result"=>"19", "resultDesc"=>"Forwarding record failed ($sql)".$database->errorCode()." ".$database->errorInfo(), "data"=>$data);
+		}
+		
 		return array("result"=>"0", "resultDesc"=>"Hook execution successful",  "data"=>$data);
 	}
 }

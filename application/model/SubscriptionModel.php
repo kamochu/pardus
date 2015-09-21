@@ -3,7 +3,10 @@ namespace Ssg\Model;
 
 use Ssg\Core\PardusXMLParser;
 use Ssg\Core\DatabaseFactory;
+use Ssg\Core\SQLSRVDatabaseFactory;
+use \PDO;
 use Ssg\Core\Model;
+use Ssg\Core\Config;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -170,7 +173,13 @@ class SubscriptionModel extends Model
 				if( isset($data['key'.$i])&& isset($data['value'.$i])) $named_parameters_array[$data['key'.$i]]= $data['value'.$i];
 			}
 			$named_parameters = json_encode($named_parameters_array); //encode into json string
-		}	
+		}
+		
+		//add some to pull the keyword - required by the application keyword//{"accessCode":"22348","chargeMode":"0","MDSPSUBEXPMODE":"1","objectType":"1","isAutoExtend":"0","shortCode":"22348","isFreePeriod":"false","payType":"0","transactionID":"404090102571507240446506653008","orderKey":"999000000160020096","isSubscribeCnfmFlow":"true","status":"0","validTime":"20361231210000","keyword":"m47","cycleEndTime":"20150823210000","durationOfGracePeriod":"-1","serviceAvailability":"0","channelID":"143","TraceUniqueID":"404090102571507240446506653009","operCode":"operCode","rentSuccess":"true","try":"false"}
+		
+		$data['keyword'] =''; //initialize the keyword
+		if (isset($named_parameters_array['keyword'])) $data['keyword'] = $named_parameters_array['keyword'];
+		
 		
 		// add some logic to handle exceptions in this script
 		$database=null;
@@ -237,6 +246,103 @@ class SubscriptionModel extends Model
      */
 	protected function hook($data)
 	{
-		return array("result"=>"0", "resultDesc"=>"Hook execution successful",  "data"=>$data);
+		if (Config::get('SUBSCRIPTION_FORWARDER') == 1) { //forward
+			//initialize the parameters
+			$id ="";
+			$subscriber_id ="";
+			$sp_id = "";
+			$product_id = "";
+			$service_id = "";
+			$service_list = "";
+			$update_type = "";
+			$update_time = "";
+			$update_desc = "";
+			$effective_time = "";
+			$expiry_time = "";
+			$named_parameters = "";
+			$keyword = "";
+			
+			//get the data from array
+			if(isset($data['_lastInsertID'])) $id = $data['_lastInsertID'];
+			if(isset($data['ID'])) $subscriber_id = $data['ID'];
+			if(isset($data['spID'])) $sp_id = $data['spID'];
+			if(isset($data['productID'])) $product_id = $data['productID'];
+			if(isset($data['serviceID'])) $service_id = $data['serviceID'];
+			if(isset($data['serviceList'])) $service_list = $data['serviceList'];
+			if(isset($data['updateType'])) $update_type = $data['updateType'];
+			if(isset($data['updateTime'])) $update_time = $data['updateTime'];
+			if(isset($data['updateDesc'])) $update_desc = $data['updateDesc'];
+			if(isset($data['effectiveTime'])) $effective_time = $data['effectiveTime'];
+			if(isset($data['expiryTime'])) $expiry_time = $data['expiryTime'];
+			if(isset($data['keyword'])) $keyword = $data['keyword'];
+		
+			
+			// process named parameters - key value pairs
+			if (isset($data['key'])) {
+				$count = $data['repeatedParameters']['key'];
+				$named_parameters_array = array($data['key'] => $data['value']); //initial key and value pair
+				for ($i=1; $i<=$count; $i++) {
+					if( isset($data['key'.$i])&& isset($data['value'.$i])) $named_parameters_array[$data['key'.$i]]= $data['value'.$i];
+				}
+				$named_parameters = json_encode($named_parameters_array); //encode into json string
+			}	
+			
+			// add some logic to handle exceptions in this script
+			$database=null;
+			try {
+				//$database = SQLSRVDatabaseFactory::getFactory()->getConnection();
+				$options = array(PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ, PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING);
+				$database = new PDO('sqlsrv:Server=SEMATEL-SERVER;Database=db_Sematel','sa', 'SematelServer2014', $options);
+			} catch (Exception $ex) {
+				return  array('result' => 3, 'resultDesc' => 'Cannot connect to the database. Error: '.$ex->getMessage()); 
+			}
+			
+			try {		
+				$database->beginTransaction();
+				//$sql=$sql="INSERT INTO dbo.tbl_Subscription_messages (id, subscriber_id, sp_id, product_id, service_id, service_list, update_type, update_desc, effective_time, expiry_time, created_on) VALUES (:id,:subscriber_id,:sp_id,:product_id,:service_id,:service_list,:update_type,:update_desc,:effective_time,:expiry_time,CURRENT_TIMESTAMP)";
+				$sql="INSERT INTO dbo.tbl_Subscription_messages (id, subscriber_id, sp_id, product_id, service_id, service_list, update_type, update_desc, effective_time, expiry_time, created_on, keyword) VALUES (:id,:subscriber_id,:sp_id,:product_id,:service_id,:service_list,:update_type,:update_desc,:effective_time,:expiry_time,CURRENT_TIMESTAMP,:keyword)";;
+				
+				$query = $database->prepare($sql);
+	
+				$bind_patameters = array(':id' => $id, ':subscriber_id' => $subscriber_id , ':sp_id' => $sp_id, ':product_id' => $product_id, ':service_id' => $service_id, ':service_list' => $service_list, ':update_type' => $update_type, ':update_desc' => $update_desc, ':effective_time' => $effective_time,  ':expiry_time' => $expiry_time, ':keyword'=>$keyword);
+				
+				$this->logger->debug(
+						'{class_mame}|{method_name}|{service_id}|forwarding-hook|{query}|bind_parameters:{bind_params}',
+						array(
+							'class_mame'=>__CLASS__,
+							'method_name'=>__FUNCTION__,
+							'query'=>$sql,
+							'bind_params'=>json_encode($bind_patameters)
+						)
+					);
+				
+				if ($query->execute($bind_patameters)) {
+					$row_count = $query->rowCount();
+					$database->commit();
+					
+					if ($row_count == 1) {	
+						return array('result'=>0, 'resultDesc'=>'Forwarding successful', 'data'=>$data);
+					}
+				} else {	
+					$this->logger->error(
+						'{class_mame}|{method_name}|{service_id}|error executing the query|{error}|{query}|bind_parameters:{bind_params}',
+						array(
+							'class_mame'=>__CLASS__,
+							'method_name'=>__FUNCTION__,
+							'error'=>$database->errorCode(),
+							'query'=>$sql,
+							'bind_params'=>json_encode($bind_patameters)
+						)
+					);
+					return  array('result' => 5, 'resultDesc' => 'Error executing a query.'); 
+				}
+			} catch (PDOException $e) {
+				return  array('result' => 4, 'resultDesc' => 'Error executing a query. Error: '.$e->getMessage()); 
+			}
+			
+			return array("result"=>"19", "resultDesc"=>"Forwarding record failed ($sql)".$database->errorCode()." ".$database->errorInfo(), "data"=>$data);
+		}
+		
+		return array("result"=>"0", "resultDesc"=>"Successful - hook is off",  "data"=>$data);
 	}
 }
