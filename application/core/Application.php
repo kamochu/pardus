@@ -96,7 +96,8 @@ class Application
 		$this->logger_name = $this->controller_name; 
 		
 		//modify the controller to include the namespace
-		$this->controller_name='\Ssg\Controller\\'.$this->controller_name;
+		$this->controller_name='\Ssg\Controller\\'. ucwords($this->controller_name);
+
 
 		// check for action: no action given ? then make action = default action (from config)
 		if (!$this->action_name OR (strlen($this->action_name) == 0)) {
@@ -104,6 +105,6 @@ class Application
 		}
 		
 		// rename controller name to real controller class/file name ("index" to "IndexController")
-		$this->controller_name = ucwords($this->controller_name) . 'Controller';
+		$this->controller_name = $this->controller_name . 'Controller';
 	}
 }

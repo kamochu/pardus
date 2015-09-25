@@ -87,9 +87,9 @@ return array(
 	 */
 	'DB_TYPE' => 'mysql',
 	'DB_HOST' => 'localhost',
-	'DB_NAME' => 'sematel_ssg',
-	'DB_USER' => 'root',
-	'DB_PASS' => 'admin',
+	'DB_NAME' => 'ssg',
+	'DB_USER' => 'app',
+	'DB_PASS' => '!QAZ2wsx',
 	'DB_PORT' => '3306',
 	'DB_CHARSET' => 'utf8',
 	/**
@@ -183,23 +183,23 @@ return array(
 	/**
 	 * Configuration for: SP SDP data
 	 */
-	'SP_ID' => '601320',
-	'SP_PASSWORD' => 'Smtel#2015',
+	'SP_ID' => '601626',
+	'SP_PASSWORD' => 'Discovery2015#',
 	/**
 	 * Configuration for: SDP SendSms configurations
 	 */
-	'SEND_SMS_DEFAULT_SERVICE_ENDPOINT' => 'http://196.201.216.14:8310/SendSmsService/services/SendSms',
+	'SEND_SMS_DEFAULT_SERVICE_ENDPOINT' => 'http://196.201.216.13:8310/SendSmsService/services/SendSms',
 	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_FLAG' => 1,
-	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_ENDPOINT' => 'http://41.222.9.250:49200/ssg/delivery/receipt/',
+	'SEND_SMS_DEFAULT_DELIVERY_NOTIFICATION_ENDPOINT' => 'http://216.172.165.211/test/',
 	'SEND_SMS_MAXIMUM_RECIPIENTS' => 1,
 	/**
 	 * Configuration for: SDP Get Sms Delivery Status configurations
 	 */
-	'GET_DELIVERY_STATUS_DEFAULT_SERVICE_ENDPOINT' => 'http://196.201.216.14:8310/SendSmsService/services/SendSms',
+	'GET_DELIVERY_STATUS_DEFAULT_SERVICE_ENDPOINT' => 'http://196.201.216.13:8310/SendSmsService/services/SendSms',
 	/**
 	 * Configuration for: SDP SmsNotificationManager configurations
 	 */
-	'SMS_NOTIFICATION_MANAGER_ENDPOINT' => 'http://196.201.216.14:8310/SmsNotificationManagerService/services/SmsNotificationManager',
+	'SMS_NOTIFICATION_MANAGER_ENDPOINT' => 'http://196.201.216.13:8310/SmsNotificationManagerService/services/SmsNotificationManager',
 	/**
 	 * Configuration for: Service Manager configurations
 	 * SMS_ON_DEMAND_SERVICE_TYPE on demand service type id, confirm the database configurations

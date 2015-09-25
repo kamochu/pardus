@@ -6,6 +6,7 @@ use Ssg\Core\SDP;
 use Ssg\Core\DatabaseFactory;
 use Ssg\Core\Model;
 use Psr\Log\LoggerInterface;
+use \stdClass;
 
 /**
  * SendModel used in sending messages to external server
